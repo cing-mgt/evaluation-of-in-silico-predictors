@@ -1,0 +1,4 @@
+Tool,Threshold,MCC
+ada_score,0.5,0.68
+rf_score,0.6,0.68
+SpliceAI_DS,0.65,0.75

@@ -1,0 +1,586 @@
+---
+title: "refine-tool-thresholds"
+author: "Maria Xenophontos"
+date: "3/2/2022"
+output:
+  html_document: default
+  pdf_document: default
+params:
+   f1: ./vep-results-clean-and-extended.csv
+   f2: ./results/performance-evaluation-continuous.xlsx
+   f3: ./results/continuous-threshold-config.csv
+   f4: ./results/continuous-threshold-splicing-config.csv
+   f5: ./results/performance-evaluation-splicing.xlsx
+   f6: ./results/performance-evaluation-subsets.xlsx
+   output_path: ./results
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<!-- Import required libraries -->
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+
+#for reproducible results
+set.seed(2584)
+# to handle error like in SO:34624002
+options(java.parameters = "-Xmx10000m")
+
+#load libraries
+box::use(
+  dplyr[d_filter = filter, d_select = select, ...],
+  # for unite
+  tidyr[...],
+  # for enframe  
+  tibble[...],
+  readr[...],
+  # for map_chr
+  purrr[...],
+  stringr[...],
+  knitr[...],
+  # For pretty-printed tables
+  pander[...],
+  readxl[...], 
+  xlsx[write.xlsx],
+  source/metrics[...],
+  )
+```
+
+```{r import-data}
+#read VEP tools predictions
+vep_results =  read_csv(params$f1) %>%
+   #Set as R's NA
+   mutate_if(is.character, list(~na_if(., "-"))) %>% 
+   mutate_if(is.character, list(~na_if(., "NA"))) %>%
+   mutate_at(vars(matches("score"), "CADD_PHRED", "SpliceAI_DS", 
+                  "MaxEntScan_diff", "MaxEntScan_score",  "Eigen-PC-phred_coding", "GERP++_RS", "Eigen-phred_coding"), as.numeric) %>%
+   # handling different case from different tools
+   mutate(Observed_pathogenicity = recode(Observed_pathogenicity, 
+                                          !!!setNames(c("P/LP", "VUS",
+                                                        "B/LB", "B/LB", 
+                                                        "VUS"), 
+                                                      c("Pathogenic/Likely Pathogenic", "Uncertain significance",
+                                                        "Benign/Likely Benign", "Benign/Likely benign",
+                                                        "Uncertain Significance")
+                                                      )))
+
+snvs_cnt  = vep_results %>%
+   group_by(Observed_pathogenicity) %>% 
+   summarise(cnt = n()) %>%
+   bind_rows(tibble(Observed_pathogenicity = "Total", cnt = vep_results %>% nrow))
+
+#get pathogenic snvs
+pathogenic_snvs = vep_results %>% d_filter(Observed_pathogenicity == "P/LP")
+#get benign snvs
+benign_snvs = vep_results %>% d_filter(Observed_pathogenicity == "B/LB")
+
+#r_continuous = read_csv(params$f3) 
+r_continuous = read_xlsx(params$f2, sheet = "Varied prediction threshold") 
+thresholds = lapply(list(params$f3, params$f4), read_csv, col_names = T) %>%
+   Reduce(function(df1, df2) bind_rows(as_tibble(df1), as_tibble(df2)), .)
+
+r_continuous_splicing = read_xlsx(params$f5, sheet = "Varied prediction thresholds")
+splicing = read_xlsx(params$f5, sheet = "Input-Splicing subset")
+splicing_pathogenic = splicing %>% 
+   d_filter(str_detect(Observed_pathogenicity, "P/LP") & str_detect(effect,"Splicing"))
+splicing_benign = splicing %>% 
+   d_filter(str_detect(effect, "Splicing", negate = T) & 
+               effect != "Missense Plus" & Observed_pathogenicity != "VUS")
+splicing = list(input = r_continuous_splicing,
+                predictions = splicing, 
+                pathogenic = splicing_pathogenic, 
+                benign = splicing_benign)
+
+```
+
+```{r recommended-threshold, message=FALSE, echo=FALSE}
+dir.create(file.path(params$output_path, "at-refined-thresholds"))
+
+# These are the best tools as identified from the analysis in evaluate-performance.Rmd
+best_tools = c('BayesDel_addAF_score','CADD_PHRED', 
+                          'Eigen-PC-phred_coding', 'GERP++_RS', 
+                          'REVEL_score', 'SpliceAI_DS', 
+                          'MetaSVM_score', "phyloP100way_vertebrate", 
+                          "phastCons30way_mammalian")
+
+# input is the output of compute_metrics_for_continuous()
+# tools is the selected tools
+get_refined_thresholds = function(input,
+                                  tools = best_tools,
+                                  set_label = "", 
+                                  splicing_list = splicing,
+                                  thresholds = thresholds, 
+                                  predictions = vep_results, 
+                                  pathogenic = pathogenic_snvs, 
+                                  benign = benign_snvs){
+   
+   if(set_label != "") {
+      set_label = str_c("-", set_label)
+   } else{
+      # if running on the general set add the data for SpliceAI to input
+      input = bind_rows(input, splicing_list$input)
+   }
+  
+   suggested_thresholds = bind_rows(input %>%
+                                       d_filter(Tool %in% tools) %>% 
+                                       d_filter(`LR+_CI_lower` >= 2.08) %>%
+                                       mutate(P = TRUE),
+                                    input %>% 
+                                       d_filter(Tool %in% tools) %>% 
+                                       d_filter(`LR-_CI_upper` <= 1/2.08) %>%
+                                       mutate(B = TRUE)) %>%
+      group_by(Tool, Threshold) %>%
+      fill(P, .direction = "downup") %>%
+      fill(B, .direction = "downup") %>%
+      distinct() %>% ungroup() %>%
+      # compute "accuracy" again with more decimal points
+      # and use TP if threshold passes criteria only for patogenic and
+      # TN if passes criteria only for benign
+      mutate(correctly_pv_p = ifelse(P, TP/PV_NV, NA), 
+             correctly_pv_b = ifelse(B, TN/PV_NV, NA)) %>%
+      mutate(P = replace_na(P, FALSE), 
+             B = replace_na(B, FALSE))
+   
+   if(nrow(suggested_thresholds) == 0){
+      return(tibble())
+   }
+   
+   write.xlsx(suggested_thresholds %>%
+                 rename(`Pathogenic criterion` = P, 
+                        `Benign criterion` = B) %>%
+                 as.data.frame(), 
+             file.path(params$output_path, "at-refined-thresholds", 
+                       str_c("performance-evaluation-continuous", set_label, ".xlsx")), 
+             sheetName = str_c("Met OddsP criteria"),
+             row.names = F, append = F)
+   
+   
+   step_length = map(c(params$f3, params$f4), read_csv) %>%
+      Reduce(function(df1, df2) bind_rows(as_tibble(df1), as_tibble(df2)), .) %>%
+      group_by(tool) %>%
+      mutate(# this is the initial step
+             step = th -lag(th),
+             score_01 = ifelse(step == 0.05, 1, 0),
+             step = step / 10, 
+             # rounding to the nearest quarter of a unit
+             step = case_when(step > 0.1 ~round(step/0.25) * 0.25,
+                              step <= 0.1 ~0.01), 
+             th = list(th)) %>%
+      d_filter(!is.na(step)) %>%
+      summarise(step = median(step), score_01 = unique(score_01)) %>%
+      ungroup() %>%
+      distinct(tool, step, .keep_all = T) %>%
+      rename(Tool = tool)
+      
+   refined_thresholds = suggested_thresholds %>%
+      group_by(Tool, P, B) %>%
+      arrange(desc(correctly_pv_p), desc(correctly_pv_b)) %>%
+      slice(1) %>%
+      ungroup() %>%
+      d_select(Tool, Threshold, correctly_pv_p, correctly_pv_b) %>%
+      left_join(step_length, by="Tool") %>%
+      mutate(center = case_when(step < 0.1 ~round(Threshold, digits = 2), 
+                                step < 1 ~round(Threshold, digits = 1), 
+                                step >= 1 ~round(Threshold, digits = 0)), 
+             lbound = case_when(score_01 == 0 ~center - (step * 50), 
+                                score_01 == 1 ~0),  
+             ubound = case_when(score_01 == 0 ~center + (step * 50), 
+                                score_01 == 1 ~1)) %>%
+      group_by(Tool) %>%
+      rowwise() %>%
+      summarise(refined_th = list(seq(lbound, ubound, by = step)), .groups="keep") %>%
+      unnest(refined_th) %>%
+      rename(tool = Tool) %>%
+      left_join(thresholds %>%
+                   d_select(tool, th_class) %>% 
+                   d_filter(tool %in% tools) %>%
+                   distinct, by = "tool") %>%
+      rename(th = refined_th) %>%
+      # because of rounding values might differ in tiny small fraction and not 
+      # be marked equal by distinct, and I can't use alll.equal with distinct
+      # so do the distinct check on a character conversion of the threshold
+      mutate(th_char = as.character(th)) %>%
+      # because in case that I have 3 center points I might get overlapping windows
+      distinct(tool, th_char, .keep_all = T) %>%
+      d_select(-th_char)
+   
+   write.xlsx(refined_thresholds %>% as.data.frame(), 
+             file.path(params$output_path, "at-refined-thresholds",
+                       str_c("performance-evaluation-continuous", set_label, ".xlsx")), 
+             sheetName = str_c("Refined thresholds"),
+             row.names = F, append = T)
+      
+   stats = pmap_dfr(refined_thresholds %>% 
+                       d_filter(!is.na(th) & !is.na(th_class)) %>%
+                       d_filter(tool != 'SpliceAI_DS'), 
+                    compute_metrics_for_continuous, 
+                    predictions = predictions, 
+                    pathogenic = pathogenic,
+                    benign = benign) %>%
+      #round numeric values to 2 point decimals
+      # but not with mutate_if(is.numeric, ~round(., 2))
+      # because then the thresholds are also rounded
+      mutate(across(11:24, ~round(., 2)))
+   
+   # if function not called for subset run SpliceAI on the splicing data too
+   if(set_label == ""){
+      stats_splicing = pmap_dfr(refined_thresholds %>% 
+                                   d_filter(!is.na(th) & !is.na(th_class)) %>%
+                                   d_filter(tool == 'SpliceAI_DS'),
+                                compute_metrics_for_continuous, 
+                                predictions = splicing$predictions, 
+                                pathogenic = splicing$pathogenic,
+                                benign = splicing$benign) %>%
+         #round numeric values to 2 point decimals
+         # but not with mutate_if(is.numeric, ~round(., 2))
+         # because then the thresholds are also rounded
+         mutate(across(11:24, ~round(., 2)))
+      stats = bind_rows(stats, stats_splicing)
+   }
+   
+   write.xlsx(stats %>% as.data.frame(), 
+             file.path(params$output_path, "at-refined-thresholds",
+                       str_c("performance-evaluation-continuous", set_label, ".xlsx")), 
+             sheetName = str_c("Varied prediction threshold"),
+             row.names = F, append = T)
+   
+   suggested_thresholds = bind_rows(stats %>%
+                                       d_filter(Tool %in% tools) %>% 
+                                       d_filter(`LR+_CI_lower` >= 2.08) %>%
+                                       mutate(P = TRUE),
+                                    stats %>% 
+                                       d_filter(Tool %in% tools) %>% 
+                                       d_filter(`LR-_CI_upper` <= 1/2.08) %>%
+                                       mutate(B = TRUE)) %>%
+      group_by(Tool, Threshold) %>%
+      fill(P, .direction = "downup") %>%
+      fill(B, .direction = "downup") %>%
+      # compute "accuracy" again with more decimal points
+      # and use TP if threshold passes criteria only for patogenic and
+      # TN if passes criteria only for benign
+      mutate(correctly_pv_p = ifelse(P, TP/PV_NV, NA), 
+             correctly_pv_b = ifelse(B, TN/PV_NV, NA)) %>%
+      mutate(P = replace_na(P, FALSE), 
+             B = replace_na(B, FALSE)) %>%
+      mutate(across(2:24, ~as.double(.))) %>%
+      bind_rows(suggested_thresholds) %>%
+      ungroup() %>%  
+      # because of rounding values might differ in tiny small fraction and not 
+      # be marked equal by distinct, and I can't use alll.equal with distinct
+      # so do the distinct check on a character conversion of the threshold
+      mutate(th_char = as.character(Threshold)) %>%
+      # because in case that I have 3 center points I might get overlapping windows
+      distinct(Tool, th_char, .keep_all = T) %>%
+      d_select(-th_char)
+      
+   suggested_thresholds = suggested_thresholds %>% 
+      group_by(Tool, P, B) %>%
+      arrange(desc(correctly_pv_p), desc(correctly_pv_b), .by_group = TRUE)
+   
+   write.xlsx(suggested_thresholds %>% as.data.frame(), 
+             file.path(params$output_path, "at-refined-thresholds",
+                       str_c("performance-evaluation-continuous", set_label, ".xlsx")), 
+             sheetName = str_c("Suggested threshold"),
+             row.names = F, append = T)
+   
+   ultimate_thresholds = suggested_thresholds %>% 
+      d_filter(P == TRUE) %>%
+      d_select(Tool, Threshold) %>%
+      group_by(Tool) %>% 
+      summarise(th_p = list(Threshold)) %>%
+      full_join(suggested_thresholds %>% 
+                   d_filter(B == TRUE) %>%
+                   d_select(Tool, Threshold) %>%
+                   group_by(Tool) %>% 
+                   summarise(th_b = list(Threshold)),
+                by = "Tool") %>%
+      unnest(th_p) %>%
+      unnest(th_b) %>%
+      distinct() %>%
+      left_join(suggested_thresholds %>%
+                   group_by(Tool, Threshold) %>%
+                   d_filter(!is.na(correctly_pv_p)) %>%
+                   d_select(Tool, Threshold, Sensitivity, TP, correctly_pv_p, contains("LR+")) %>%
+                   rename(th_p = Threshold),
+                by = c("Tool", "th_p")) %>%
+      left_join(suggested_thresholds %>%
+                   group_by(Tool, Threshold) %>%
+                   d_filter(!is.na(correctly_pv_b)) %>%
+                   ungroup() %>%
+                   d_select(Tool, Threshold, Specificity, TN, correctly_pv_b, contains("LR-")) %>%
+                   rename(th_b = Threshold),
+                by = c("Tool", "th_b")) %>%
+      left_join(thresholds %>% rename(Tool = tool) %>% 
+                   d_select(Tool, th_class) %>% distinct(),
+                by = "Tool") %>%
+      group_by(Tool) %>% 
+      arrange(desc(correctly_pv_p), desc(correctly_pv_b), .by_group = T) %>% 
+      mutate(`% of correctly PV` = correctly_pv_p + correctly_pv_b, 
+             `Correctly PV` = TP + TN, 
+             `LR+ 95% CI` = str_c("[", `LR+_CI_lower`, ", ",  `LR+_CI_upper` ,"]"), 
+             `LR- 95% CI` = str_c("[", `LR-_CI_lower`, ", ", `LR-_CI_upper` ,"]"), 
+             `Pathogenic Threshold`  = case_when(th_class == "above_closed" ~ str_c(">=", th_p), 
+                                             th_class == "above" ~ str_c(">", th_p), 
+                                             th_class == "below_closed" ~ str_c("<=", th_p), 
+                                             th_class == "below" ~ str_c("<", th_p)),
+             `Benign Threshold` = case_when(th_class == "above_closed" ~ str_c("<", th_b), 
+                                            th_class == "above" ~ str_c("<=", th_b), 
+                                            th_class == "below_closed" ~ str_c(">", th_b), 
+                                            th_class == "below" ~ str_c(">=", th_b)),
+             `Strength (Pathogenic)` = case_when(`LR+_CI_lower` >= 350 ~"Very Strong",
+                                                 `LR+_CI_lower` >= 18.7 ~"Strong",
+                                                 `LR+_CI_lower` >= 4.3 ~"Moderate",
+                                                 `LR+_CI_lower` >= 2.08 ~"Supporting"),
+             `Strength (Benign)` = case_when(`LR-_CI_upper` <= 1/2.08 ~"Supporting",
+                                             `LR-_CI_upper` <= 1/4.3 ~"Moderate",
+                                             `LR-_CI_upper` <= 1/18.7 ~"Strong",
+                                             `LR-_CI_upper` <= 1/350 ~"Very Strong"),
+             diff = th_p - th_b
+             ) %>%
+      d_filter(th_b <= th_p) %>%
+      arrange( desc(`Correctly PV`), desc(`% of correctly PV`), 
+               desc(`LR+`), `LR-`, diff) %>%
+      d_select(Tool,
+               `Pathogenic Threshold`, Sensitivity, `LR+`, `LR+ 95% CI`, `Strength (Pathogenic)`,
+               `Benign Threshold`, Specificity, `LR-`, `LR- 95% CI`, `Strength (Benign)`, 
+               `Correctly PV`, `% of correctly PV`
+               )
+   
+   if(nrow(ultimate_thresholds) != 0){
+      write.xlsx(ultimate_thresholds %>% as.data.frame(), 
+                file.path(params$output_path, "at-refined-thresholds",
+                          str_c("performance-evaluation-continuous", set_label, ".xlsx")), 
+                sheetName = str_c("Threshold combinations"),
+                row.names = F, append = T)
+      
+      ultimate_thresholds = ultimate_thresholds %>%
+         group_by(Tool, `Strength (Pathogenic)`, `Strength (Benign)`) %>%
+         arrange(desc(`Correctly PV`), desc(`% of correctly PV`), .by_group = T) %>% 
+         slice(1) 
+   
+      write.xlsx(ultimate_thresholds %>% as.data.frame(), 
+                file.path(params$output_path, "at-refined-thresholds",
+                          str_c("performance-evaluation-continuous", set_label, ".xlsx")), 
+                sheetName = "Table 2",
+                row.names = F, append = T)
+   }
+   
+   return(suggested_thresholds)
+}
+   
+get_refined_thresholds(r_continuous,
+                       splicing_list = splicing,
+                       thresholds = thresholds)
+
+```
+
+```{r recommended-threshold-based-on-subsets, message=FALSE, echo=FALSE}
+
+set_labels = c("Missense", "Non Missense", "HBA1", "HBA2", "HBB")
+
+sapply(set_labels, function(x){
+   r_continuous = read_xlsx(params$f6, sheet = x)
+   predictions = read_xlsx(params$f6, sheet = str_c("Input-", x))
+   pathogenic = predictions %>%
+      d_filter(str_detect(Observed_pathogenicity, "P/LP"))
+   benign = predictions %>%
+      d_filter(str_detect(Observed_pathogenicity, "B/LB"))
+   
+   get_refined_thresholds(r_continuous,
+                          set_label = str_replace(x, "\\s", "-"),
+                          thresholds = thresholds, 
+                          predictions = predictions, 
+                          pathogenic = pathogenic, 
+                          benign = benign)
+})
+
+```
+
+```{r concordance, eval=TRUE}
+ultimate_thresholds = read_xlsx(file.path(params$output_path, 'at-refined-thresholds', 
+                                          str_c("performance-evaluation-continuous.xlsx")), 
+                                sheet = "Table 2") %>%
+   d_filter(`Strength (Pathogenic)` == "Supporting")
+
+ultimate_thresholds_formatted = ultimate_thresholds %>%
+   rename(tool = Tool, th_p = `Pathogenic Threshold`, th_b = `Benign Threshold`) %>%
+   d_select(tool, th_p, th_b) %>%
+   mutate(th_p = as.numeric(str_replace(th_p, "^\\D*", "")), 
+          th_b = as.numeric(str_replace(th_b, "^\\D*", ""))) %>%
+   left_join(thresholds %>% d_select(tool, th_class) %>% distinct(), by="tool") 
+
+# Produce a concordance matrix to use for plotting concordance at refined thresholds
+# as a heatmap
+concordance = vep_results %>% 
+   d_select(c('ithaID', 'HGVS', ultimate_thresholds_formatted %>% .[['tool']])) %>% 
+   pivot_longer(-c(ithaID, HGVS), names_to = "tool", values_to = "value") %>% 
+   left_join(ultimate_thresholds_formatted, by="tool") %>% 
+   mutate(call_p = case_when(th_class == "below" & value < th_p ~ 'P/LP',
+                           th_class == "below_closed" & value <= th_p ~ 'P/LP', 
+                           th_class == "above" & value > th_p ~ 'P/LP', 
+                           th_class == "above_closed" & value >= th_p ~ 'P/LP', 
+                           !is.na(value) ~ ''),
+          call_b = case_when(th_class == "below" & value >= th_b ~ 'B/LB',
+                           th_class == "below_closed" & value > th_b ~ 'B/LB', 
+                           th_class == "above" & value <= th_b ~ 'B/LB', 
+                           th_class == "above_closed" & value < th_b ~ 'B/LB', 
+                           !is.na(value) ~ '',
+                           ), 
+          call = case_when(call_p == "" & call_b == "" ~"VUS",
+                           is.na(call_p) ~ call_p, 
+                           call_p != '' ~ call_p, 
+                           call_b != '' ~ call_b)) %>%
+  right_join(vep_results %>% 
+              d_select(ithaID, HGVS, Observed_pathogenicity) %>%
+              d_filter(Observed_pathogenicity != "VUS"), by=c("ithaID", "HGVS")) %>%
+  # converting NAs to 0 since the heatmap scale is -1, 0, 1 with -1 being
+  # discordance, 0 being NA, and 1 being concordance
+  mutate(concordance = ifelse(is.na(call), 0, 
+                              ifelse(!is.na(call) & call == Observed_pathogenicity, 1, -1))) %>%
+  pivot_wider(-c('value', 'th_p', 'th_b',
+                 'th_class', 'call_p', 'call_b', 
+                 'call_b', 'call', 'Observed_pathogenicity'), 
+              names_from = "tool", values_from = "concordance")
+
+write_csv(concordance, 
+          file = file.path(params$output_path, 'at-refined-thresholds', "concordance.csv"))
+
+```
+
+
+```{r concordance-rate, eval=TRUE}
+# split concordance to benign and pathogenic as in paper
+# do this on the suggested thresholds - define concordance if passing the suggested threshold and not on 
+# the binary classification done for the heatmap with the mcc max threshold
+# do upset R graph with true concordance in the bar graph
+# sorting by true concordance, remove n1, print all but keep 10
+
+# pass the dataframe with binary classification of calls based on refined thresholds
+get_concordance = function(r){
+   best_tools = r %>%
+      d_select(-ithaID, -HGVS) %>% 
+      colnames() 
+   n_tools = length(best_tools)
+   
+   combinations = pmap(list(2:n_tools), function(x) {
+      combn(best_tools, x) %>% 
+         as.data.frame() %>% 
+         pivot_longer(everything()) %>% 
+         group_by(name) %>% 
+         summarise(value = list(value)) %>%
+         mutate(name =  str_c("n", x, "_", name, sep="")) %>% 
+         rowwise() %>% mutate(tools = str_c(value, collapse = ", ")) 
+      }) %>% 
+      Reduce(function(df1, df2) bind_rows(as_tibble(df1), as_tibble(df2)), .)
+   
+   concordance_rate = pmap(list(combinations %>% .[['name']]),
+                           function(combination){
+                              x = combinations %>%
+                                 d_filter(name == combination) %>% 
+                                 .[['value']]
+                              
+                              tibble( name = combination, 
+                                      total = nrow(r),
+                                      na =  r %>% 
+                                         d_select(any_of(unlist(x))) %>%
+                                         filter_all(all_vars(is.na(.))) %>%
+                                         nrow(), 
+                                      eligible = total - na,
+                                      correct_call = r %>%
+                                         d_select(any_of(unlist(x))) %>% 
+                                         filter_all(all_vars(.==1)) %>%
+                                         nrow(),
+                                      concordance = 100 * correct_call / eligible,
+                                      ) 
+                              }) %>%
+      Reduce(function(df1, df2) bind_rows(as_tibble(df1), as_tibble(df2)), .) %>%
+      left_join(combinations %>% d_select(name, tools, value), by="name") %>%
+      arrange(desc(concordance))
+}
+
+   
+# 0 here doesn't mean that the tool predicted it benign but that it did not 
+# predict it as pathogenic
+pathogenic_binary = pathogenic_snvs %>% 
+   d_select(c('ithaID', 'HGVS', ultimate_thresholds_formatted %>% .[['tool']])) %>% 
+   pivot_longer(-c(ithaID, HGVS), names_to = "tool", values_to = "value") %>% 
+   left_join(ultimate_thresholds_formatted %>% d_select(-th_b), by="tool") %>% 
+   mutate(concordance = case_when(th_class == "below" & value < th_p ~ 1,
+                                  th_class == "below_closed" & value <= th_p ~ 1, 
+                                  th_class == "above" & value > th_p ~ 1, 
+                                  th_class == "above_closed" & value >= th_p ~ 1, 
+                                  !is.na(value) ~0,
+                                  )) %>%
+    pivot_wider(-c('value', 'th_p', 'th_class'), names_from = "tool", values_from = "concordance") 
+
+concordance_pathogenic = get_concordance(pathogenic_binary) %>% 
+   mutate(class= "Pathogenic")
+
+# 0 here doesn't mean that the tool predicted it pathogenic but that it did not 
+# predict it as benign
+benign_binary = benign_snvs %>% 
+   d_select(c('ithaID', 'HGVS', ultimate_thresholds_formatted %>% .[['tool']])) %>% 
+   pivot_longer(-c(ithaID, HGVS), names_to = "tool", values_to = "value") %>% 
+   left_join(ultimate_thresholds_formatted %>% d_select(-th_p), by="tool") %>% 
+   mutate(concordance = case_when(th_class == "below" & value >= th_b ~ 1,
+                                  th_class == "below_closed" & value > th_b ~ 1, 
+                                  th_class == "above" & value <= th_b ~ 1, 
+                                  th_class == "above_closed" & value < th_b ~ 1, 
+                                  !is.na(value) ~0,
+                                  )) %>%
+    pivot_wider(-c('value', 'th_b', 'th_class'), names_from = "tool", values_from = "concordance") 
+
+concordance_benign = get_concordance(benign_binary) %>%
+   mutate(class= "Benign")
+
+concordance_rate = bind_rows(concordance_benign, concordance_pathogenic)
+write_csv(concordance_rate, file = file.path(params$output_path, 'at-refined-thresholds',  "concordance-rate.csv"))
+```
+
+
+```{r vus-analysis}
+# for the VUS run/analysis get input threshold from file
+vus_snvs = vep_results %>%
+   d_filter(Observed_pathogenicity == "VUS") 
+   
+vus_calls = vus_snvs %>% 
+   d_select(c('ithaID', 'HGVS', ultimate_thresholds %>% .[['Tool']])) %>% 
+   pivot_longer(-c(ithaID, HGVS), names_to = "Tool", values_to = "value") %>% 
+   left_join(ultimate_thresholds, by="Tool") %>% 
+   rename(th_p = `Pathogenic Threshold`, 
+          th_b = `Benign Threshold`) %>%
+   mutate(th_p = as.numeric(str_replace(th_p, "^\\D*", "")), 
+          th_b = as.numeric(str_replace(th_b, "^\\D*", ""))) %>%
+   left_join(thresholds %>% 
+                d_select(tool, th_class) %>% 
+                distinct() %>%
+                rename(Tool = tool), by="Tool" ) %>%
+   mutate(call_p = case_when(th_class == "below" & value < th_p ~ 1,
+                           th_class == "below_closed" & value <= th_p ~ 1, 
+                           th_class == "above" & value > th_p ~ 1, 
+                           th_class == "above_closed" & value >= th_p ~ 1, 
+                           !is.na(value) ~-1,
+                           ), 
+          call_b = case_when(th_class == "below" & value >= th_b ~ 0,
+                             th_class == "below_closed" & value > th_b ~ 0, 
+                             th_class == "above" & value <= th_b ~ 0, 
+                             th_class == "above_closed" & value < th_b ~ 0, 
+                             !is.na(value) ~-1,
+                           ))
+
+# sanity check, if nrow(x) !=0 something is wrong with the selected thresholds
+vus_calls %>% d_filter(call_p == 1 & call_b ==0)
+write_csv(vus_calls, file = file.path(params$output_path, "at-refined-thresholds", "vus-analysis.csv"))
+
+vus_calls_summary = vus_calls %>% 
+   group_by(Tool) %>% 
+   summarise(vus_cnt =  sum(!is.na(call_p) & !is.na(call_b) & 
+                               call_p == -1 & call_b == -1), 
+             p_cnt = sum(!is.na(call_p) & call_p==1), 
+             b_cnt = sum(!is.na(call_b) & call_b==0),
+             na_cnt = sum(is.na(call_p) & is.na(call_b))
+             )
+write_csv(vus_calls_summary, file = file.path(params$output_path, 'at-refined-thresholds',  "vus-analysis-summary.csv"))
+```

@@ -1,0 +1,495 @@
+name,total,na,eligible,correct_call,concordance,tools,value,class
+n2_V17,194,77,117,77,65.8119658119658,"Eigen-PC-phred_coding, REVEL_score",,Benign
+n2_V15,194,77,117,68,58.11965811965812,"Eigen-PC-phred_coding, MetaSVM_score",,Benign
+n2_V24,194,77,117,66,56.41025641025641,"MetaSVM_score, REVEL_score",,Benign
+n3_V42,194,77,117,65,55.55555555555556,"Eigen-PC-phred_coding, MetaSVM_score, REVEL_score",,Benign
+n2_V16,194,77,117,64,54.7008547008547,"Eigen-PC-phred_coding, phyloP100way_vertebrate",,Benign
+n2_V26,194,77,117,58,49.572649572649574,"phyloP100way_vertebrate, REVEL_score",,Benign
+n3_V44,194,77,117,57,48.717948717948715,"Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score",,Benign
+n2_V23,194,77,117,53,45.2991452991453,"MetaSVM_score, phyloP100way_vertebrate",,Benign
+n3_V41,194,77,117,53,45.2991452991453,"Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate",,Benign
+n3_V53,194,77,117,50,42.73504273504273,"MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n4_V62,194,77,117,50,42.73504273504273,"Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n2_V13,194,1,193,79,40.932642487046635,"CADD_PHRED, SpliceAI_DS",,Benign
+n2_V2,194,77,117,47,40.17094017094017,"BayesDel_addAF_score, Eigen-PC-phred_coding",,Benign
+n2_V6,194,77,117,47,40.17094017094017,"BayesDel_addAF_score, REVEL_score",,Benign
+n3_V10,194,77,117,45,38.46153846153846,"BayesDel_addAF_score, Eigen-PC-phred_coding, REVEL_score",,Benign
+n2_V14,194,77,117,41,35.042735042735046,"Eigen-PC-phred_coding, GERP++_RS",,Benign
+n2_V4,194,77,117,41,35.042735042735046,"BayesDel_addAF_score, MetaSVM_score",,Benign
+n2_V20,194,77,117,40,34.18803418803419,"GERP++_RS, phyloP100way_vertebrate",,Benign
+n3_V17,194,77,117,40,34.18803418803419,"BayesDel_addAF_score, MetaSVM_score, REVEL_score",,Benign
+n3_V38,194,77,117,40,34.18803418803419,"Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate",,Benign
+n3_V8,194,77,117,40,34.18803418803419,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score",,Benign
+n2_V19,194,77,117,39,33.333333333333336,"GERP++_RS, MetaSVM_score",,Benign
+n3_V37,194,77,117,39,33.333333333333336,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score",,Benign
+n4_V21,194,77,117,39,33.333333333333336,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score, REVEL_score",,Benign
+n2_V21,194,77,117,38,32.47863247863248,"GERP++_RS, REVEL_score",,Benign
+n3_V39,194,77,117,38,32.47863247863248,"Eigen-PC-phred_coding, GERP++_RS, REVEL_score",,Benign
+n3_V47,194,77,117,38,32.47863247863248,"GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Benign
+n4_V56,194,77,117,38,32.47863247863248,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Benign
+n2_V5,194,77,117,37,31.623931623931625,"BayesDel_addAF_score, phyloP100way_vertebrate",,Benign
+n3_V50,194,77,117,37,31.623931623931625,"GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Benign
+n4_V59,194,77,117,37,31.623931623931625,"Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Benign
+n2_V18,194,21,173,54,31.213872832369944,"Eigen-PC-phred_coding, SpliceAI_DS",,Benign
+n3_V48,194,77,117,36,30.76923076923077,"GERP++_RS, MetaSVM_score, REVEL_score",,Benign
+n3_V9,194,77,117,36,30.76923076923077,"BayesDel_addAF_score, Eigen-PC-phred_coding, phyloP100way_vertebrate",,Benign
+n4_V57,194,77,117,36,30.76923076923077,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score",,Benign
+n2_V8,194,2,192,58,30.208333333333332,"CADD_PHRED, Eigen-PC-phred_coding",,Benign
+n3_V19,194,77,117,35,29.914529914529915,"BayesDel_addAF_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n4_V23,194,77,117,35,29.914529914529915,"BayesDel_addAF_score, Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score",,Benign
+n4_V66,194,77,117,35,29.914529914529915,"GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n5_V51,194,77,117,35,29.914529914529915,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n2_V12,194,2,192,56,29.166666666666668,"CADD_PHRED, REVEL_score",,Benign
+n3_V25,194,2,192,56,29.166666666666668,"CADD_PHRED, Eigen-PC-phred_coding, REVEL_score",,Benign
+n2_V10,194,2,192,55,28.645833333333332,"CADD_PHRED, MetaSVM_score",,Benign
+n3_V23,194,2,192,55,28.645833333333332,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score",,Benign
+n2_V28,194,21,173,49,28.32369942196532,"REVEL_score, SpliceAI_DS",,Benign
+n3_V16,194,77,117,33,28.205128205128204,"BayesDel_addAF_score, MetaSVM_score, phyloP100way_vertebrate",,Benign
+n4_V20,194,77,117,33,28.205128205128204,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate",,Benign
+n3_V32,194,2,192,53,27.604166666666668,"CADD_PHRED, MetaSVM_score, REVEL_score",,Benign
+n4_V41,194,2,192,53,27.604166666666668,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, REVEL_score",,Benign
+n4_V32,194,77,117,32,27.35042735042735,"BayesDel_addAF_score, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n5_V27,194,77,117,32,27.35042735042735,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n3_V46,194,21,173,47,27.167630057803468,"Eigen-PC-phred_coding, REVEL_score, SpliceAI_DS",,Benign
+n2_V11,194,2,192,50,26.041666666666668,"CADD_PHRED, phyloP100way_vertebrate",,Benign
+n3_V24,194,2,192,50,26.041666666666668,"CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate",,Benign
+n3_V34,194,2,192,48,25,"CADD_PHRED, phyloP100way_vertebrate, REVEL_score",,Benign
+n4_V43,194,2,192,48,25,"CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score",,Benign
+n2_V25,194,21,173,43,24.85549132947977,"MetaSVM_score, SpliceAI_DS",,Benign
+n3_V31,194,2,192,47,24.479166666666668,"CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate",,Benign
+n4_V40,194,2,192,47,24.479166666666668,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate",,Benign
+n2_V3,194,77,117,28,23.931623931623932,"BayesDel_addAF_score, GERP++_RS",,Benign
+n3_V13,194,77,117,28,23.931623931623932,"BayesDel_addAF_score, GERP++_RS, phyloP100way_vertebrate",,Benign
+n3_V7,194,77,117,28,23.931623931623932,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS",,Benign
+n4_V17,194,77,117,28,23.931623931623932,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate",,Benign
+n2_V27,194,21,173,41,23.69942196531792,"phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n3_V43,194,21,173,41,23.69942196531792,"Eigen-PC-phred_coding, MetaSVM_score, SpliceAI_DS",,Benign
+n4_V52,194,2,192,45,23.4375,"CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n5_V42,194,2,192,45,23.4375,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n3_V55,194,21,173,40,23.121387283236995,"MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n3_V14,194,77,117,27,23.076923076923077,"BayesDel_addAF_score, GERP++_RS, REVEL_score",,Benign
+n4_V18,194,77,117,27,23.076923076923077,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, REVEL_score",,Benign
+n4_V29,194,77,117,27,23.076923076923077,"BayesDel_addAF_score, GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Benign
+n5_V24,194,77,117,27,23.076923076923077,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Benign
+n3_V45,194,21,173,39,22.54335260115607,"Eigen-PC-phred_coding, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n4_V64,194,21,173,39,22.54335260115607,"Eigen-PC-phred_coding, MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n3_V12,194,77,117,26,22.22222222222222,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score",,Benign
+n4_V16,194,77,117,26,22.22222222222222,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score",,Benign
+n4_V26,194,77,117,26,22.22222222222222,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Benign
+n5_V21,194,77,117,26,22.22222222222222,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Benign
+n4_V27,194,77,117,25,21.367521367521366,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score, REVEL_score",,Benign
+n5_V22,194,77,117,25,21.367521367521366,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score",,Benign
+n5_V31,194,77,117,25,21.367521367521366,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n6_V16,194,77,117,25,21.367521367521366,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n3_V56,194,21,173,35,20.23121387283237,"phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n2_V1,194,2,192,38,19.791666666666668,"BayesDel_addAF_score, CADD_PHRED",,Benign
+n2_V9,194,2,192,38,19.791666666666668,"CADD_PHRED, GERP++_RS",,Benign
+n3_V1,194,2,192,38,19.791666666666668,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding",,Benign
+n3_V22,194,2,192,38,19.791666666666668,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS",,Benign
+n4_V65,194,21,173,34,19.653179190751445,"Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n3_V27,194,2,192,37,19.270833333333332,"CADD_PHRED, GERP++_RS, MetaSVM_score",,Benign
+n3_V28,194,2,192,37,19.270833333333332,"CADD_PHRED, GERP++_RS, phyloP100way_vertebrate",,Benign
+n3_V5,194,2,192,37,19.270833333333332,"BayesDel_addAF_score, CADD_PHRED, REVEL_score",,Benign
+n4_V36,194,2,192,37,19.270833333333332,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score",,Benign
+n4_V37,194,2,192,37,19.270833333333332,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate",,Benign
+n4_V4,194,2,192,37,19.270833333333332,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, REVEL_score",,Benign
+n3_V29,194,2,192,36,18.75,"CADD_PHRED, GERP++_RS, REVEL_score",,Benign
+n3_V3,194,2,192,36,18.75,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score",,Benign
+n4_V2,194,2,192,36,18.75,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score",,Benign
+n4_V38,194,2,192,36,18.75,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, REVEL_score",,Benign
+n4_V46,194,2,192,36,18.75,"CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Benign
+n5_V36,194,2,192,36,18.75,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Benign
+n4_V11,194,2,192,35,18.229166666666668,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score, REVEL_score",,Benign
+n4_V47,194,2,192,35,18.229166666666668,"CADD_PHRED, GERP++_RS, MetaSVM_score, REVEL_score",,Benign
+n4_V49,194,2,192,35,18.229166666666668,"CADD_PHRED, GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Benign
+n5_V37,194,2,192,35,18.229166666666668,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score",,Benign
+n5_V39,194,2,192,35,18.229166666666668,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Benign
+n5_V6,194,2,192,35,18.229166666666668,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, REVEL_score",,Benign
+n3_V26,194,1,193,35,18.134715025906736,"CADD_PHRED, Eigen-PC-phred_coding, SpliceAI_DS",,Benign
+n3_V54,194,21,173,31,17.91907514450867,"MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n4_V63,194,21,173,31,17.91907514450867,"Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n5_V46,194,2,192,34,17.708333333333332,"CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n6_V22,194,2,192,34,17.708333333333332,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n3_V36,194,1,193,34,17.616580310880828,"CADD_PHRED, REVEL_score, SpliceAI_DS",,Benign
+n4_V45,194,1,193,34,17.616580310880828,"CADD_PHRED, Eigen-PC-phred_coding, REVEL_score, SpliceAI_DS",,Benign
+n2_V7,194,21,173,30,17.341040462427745,"BayesDel_addAF_score, SpliceAI_DS",,Benign
+n3_V4,194,2,192,33,17.1875,"BayesDel_addAF_score, CADD_PHRED, phyloP100way_vertebrate",,Benign
+n4_V3,194,2,192,33,17.1875,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate",,Benign
+n4_V70,194,21,173,29,16.76300578034682,"MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n5_V55,194,21,173,29,16.76300578034682,"Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n4_V13,194,2,192,32,16.666666666666668,"BayesDel_addAF_score, CADD_PHRED, phyloP100way_vertebrate, REVEL_score",,Benign
+n5_V8,194,2,192,32,16.666666666666668,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score",,Benign
+n3_V33,194,1,193,32,16.580310880829014,"CADD_PHRED, MetaSVM_score, SpliceAI_DS",,Benign
+n4_V42,194,1,193,32,16.580310880829014,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, SpliceAI_DS",,Benign
+n3_V11,194,21,173,28,16.184971098265898,"BayesDel_addAF_score, Eigen-PC-phred_coding, SpliceAI_DS",,Benign
+n3_V21,194,21,173,28,16.184971098265898,"BayesDel_addAF_score, REVEL_score, SpliceAI_DS",,Benign
+n4_V10,194,2,192,31,16.145833333333332,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate",,Benign
+n5_V5,194,2,192,31,16.145833333333332,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate",,Benign
+n3_V35,194,1,193,31,16.06217616580311,"CADD_PHRED, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n4_V44,194,1,193,31,16.06217616580311,"CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n4_V54,194,1,193,31,16.06217616580311,"CADD_PHRED, MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n5_V44,194,1,193,31,16.06217616580311,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n5_V17,194,2,192,30,15.625,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n6_V7,194,2,192,30,15.625,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n4_V25,194,21,173,27,15.606936416184972,"BayesDel_addAF_score, Eigen-PC-phred_coding, REVEL_score, SpliceAI_DS",,Benign
+n4_V55,194,1,193,30,15.544041450777202,"CADD_PHRED, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n5_V45,194,1,193,30,15.544041450777202,"CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n4_V53,194,1,193,28,14.507772020725389,"CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n5_V43,194,1,193,28,14.507772020725389,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n3_V2,194,2,192,27,14.0625,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS",,Benign
+n4_V1,194,2,192,27,14.0625,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS",,Benign
+n4_V7,194,2,192,27,14.0625,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, phyloP100way_vertebrate",,Benign
+n5_V2,194,2,192,27,14.0625,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate",,Benign
+n5_V50,194,1,193,27,13.989637305699482,"CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n6_V26,194,1,193,27,13.989637305699482,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n3_V18,194,21,173,24,13.872832369942197,"BayesDel_addAF_score, MetaSVM_score, SpliceAI_DS",,Benign
+n4_V34,194,21,173,24,13.872832369942197,"BayesDel_addAF_score, MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n4_V6,194,2,192,26,13.541666666666666,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score",,Benign
+n4_V8,194,2,192,26,13.541666666666666,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, REVEL_score",,Benign
+n5_V1,194,2,192,26,13.541666666666666,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score",,Benign
+n5_V11,194,2,192,26,13.541666666666666,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Benign
+n5_V14,194,2,192,26,13.541666666666666,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Benign
+n5_V3,194,2,192,26,13.541666666666666,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, REVEL_score",,Benign
+n6_V1,194,2,192,26,13.541666666666666,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Benign
+n6_V4,194,2,192,26,13.541666666666666,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Benign
+n4_V22,194,21,173,23,13.294797687861271,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score, SpliceAI_DS",,Benign
+n5_V29,194,21,173,23,13.294797687861271,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n5_V12,194,2,192,25,13.020833333333334,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score, REVEL_score",,Benign
+n6_V11,194,2,192,25,13.020833333333334,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n6_V2,194,2,192,25,13.020833333333334,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score",,Benign
+n7_V1,194,2,192,25,13.020833333333334,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Benign
+n2_V22,194,21,173,22,12.716763005780347,"GERP++_RS, SpliceAI_DS",,Benign
+n3_V40,194,21,173,22,12.716763005780347,"Eigen-PC-phred_coding, GERP++_RS, SpliceAI_DS",,Benign
+n3_V51,194,21,173,22,12.716763005780347,"GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n4_V60,194,21,173,22,12.716763005780347,"Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n3_V49,194,21,173,21,12.138728323699421,"GERP++_RS, MetaSVM_score, SpliceAI_DS",,Benign
+n4_V58,194,21,173,21,12.138728323699421,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, SpliceAI_DS",,Benign
+n4_V67,194,21,173,21,12.138728323699421,"GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n5_V52,194,21,173,21,12.138728323699421,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n3_V20,194,21,173,20,11.560693641618498,"BayesDel_addAF_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n3_V52,194,21,173,20,11.560693641618498,"GERP++_RS, REVEL_score, SpliceAI_DS",,Benign
+n4_V24,194,21,173,20,11.560693641618498,"BayesDel_addAF_score, Eigen-PC-phred_coding, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n4_V35,194,21,173,20,11.560693641618498,"BayesDel_addAF_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n4_V61,194,21,173,20,11.560693641618498,"Eigen-PC-phred_coding, GERP++_RS, REVEL_score, SpliceAI_DS",,Benign
+n4_V69,194,21,173,20,11.560693641618498,"GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n5_V30,194,21,173,20,11.560693641618498,"BayesDel_addAF_score, Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n5_V54,194,21,173,20,11.560693641618498,"Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n3_V6,194,1,193,22,11.398963730569948,"BayesDel_addAF_score, CADD_PHRED, SpliceAI_DS",,Benign
+n4_V15,194,1,193,22,11.398963730569948,"BayesDel_addAF_score, CADD_PHRED, REVEL_score, SpliceAI_DS",,Benign
+n4_V5,194,1,193,22,11.398963730569948,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, SpliceAI_DS",,Benign
+n5_V10,194,1,193,22,11.398963730569948,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, REVEL_score, SpliceAI_DS",,Benign
+n4_V68,194,21,173,19,10.982658959537572,"GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n5_V53,194,21,173,19,10.982658959537572,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n5_V56,194,21,173,19,10.982658959537572,"GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n6_V28,194,21,173,19,10.982658959537572,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n4_V33,194,21,173,18,10.404624277456648,"BayesDel_addAF_score, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n5_V28,194,21,173,18,10.404624277456648,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n5_V35,194,21,173,18,10.404624277456648,"BayesDel_addAF_score, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n6_V20,194,21,173,18,10.404624277456648,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n3_V30,194,1,193,20,10.362694300518134,"CADD_PHRED, GERP++_RS, SpliceAI_DS",,Benign
+n4_V12,194,1,193,20,10.362694300518134,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score, SpliceAI_DS",,Benign
+n4_V39,194,1,193,20,10.362694300518134,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, SpliceAI_DS",,Benign
+n4_V50,194,1,193,20,10.362694300518134,"CADD_PHRED, GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n5_V19,194,1,193,20,10.362694300518134,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n5_V40,194,1,193,20,10.362694300518134,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n5_V7,194,1,193,20,10.362694300518134,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, SpliceAI_DS",,Benign
+n6_V9,194,1,193,20,10.362694300518134,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n4_V14,194,1,193,19,9.844559585492227,"BayesDel_addAF_score, CADD_PHRED, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n4_V48,194,1,193,19,9.844559585492227,"CADD_PHRED, GERP++_RS, MetaSVM_score, SpliceAI_DS",,Benign
+n4_V51,194,1,193,19,9.844559585492227,"CADD_PHRED, GERP++_RS, REVEL_score, SpliceAI_DS",,Benign
+n5_V20,194,1,193,19,9.844559585492227,"BayesDel_addAF_score, CADD_PHRED, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n5_V38,194,1,193,19,9.844559585492227,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, SpliceAI_DS",,Benign
+n5_V41,194,1,193,19,9.844559585492227,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, REVEL_score, SpliceAI_DS",,Benign
+n5_V47,194,1,193,19,9.844559585492227,"CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n5_V49,194,1,193,19,9.844559585492227,"CADD_PHRED, GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n5_V9,194,1,193,19,9.844559585492227,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n6_V10,194,1,193,19,9.844559585492227,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n6_V23,194,1,193,19,9.844559585492227,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n6_V25,194,1,193,19,9.844559585492227,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n5_V48,194,1,193,18,9.32642487046632,"CADD_PHRED, GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n6_V24,194,1,193,18,9.32642487046632,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n6_V27,194,1,193,18,9.32642487046632,"CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n7_V8,194,1,193,18,9.32642487046632,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n5_V18,194,1,193,17,8.808290155440414,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n6_V15,194,1,193,17,8.808290155440414,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n6_V8,194,1,193,17,8.808290155440414,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n7_V5,194,1,193,17,8.808290155440414,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n3_V15,194,21,173,14,8.092485549132949,"BayesDel_addAF_score, GERP++_RS, SpliceAI_DS",,Benign
+n4_V19,194,21,173,14,8.092485549132949,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, SpliceAI_DS",,Benign
+n4_V30,194,21,173,14,8.092485549132949,"BayesDel_addAF_score, GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n4_V31,194,21,173,14,8.092485549132949,"BayesDel_addAF_score, GERP++_RS, REVEL_score, SpliceAI_DS",,Benign
+n5_V25,194,21,173,14,8.092485549132949,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n5_V26,194,21,173,14,8.092485549132949,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, REVEL_score, SpliceAI_DS",,Benign
+n5_V34,194,21,173,14,8.092485549132949,"BayesDel_addAF_score, GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n6_V19,194,21,173,14,8.092485549132949,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n4_V28,194,21,173,13,7.514450867052023,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score, SpliceAI_DS",,Benign
+n5_V23,194,21,173,13,7.514450867052023,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, SpliceAI_DS",,Benign
+n5_V32,194,21,173,13,7.514450867052023,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n5_V33,194,21,173,13,7.514450867052023,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n6_V17,194,21,173,13,7.514450867052023,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n6_V18,194,21,173,13,7.514450867052023,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n6_V21,194,21,173,13,7.514450867052023,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n7_V7,194,21,173,13,7.514450867052023,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n4_V9,194,1,193,14,7.253886010362694,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, SpliceAI_DS",,Benign
+n5_V15,194,1,193,14,7.253886010362694,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n5_V16,194,1,193,14,7.253886010362694,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, REVEL_score, SpliceAI_DS",,Benign
+n5_V4,194,1,193,14,7.253886010362694,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, SpliceAI_DS",,Benign
+n6_V14,194,1,193,14,7.253886010362694,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n6_V5,194,1,193,14,7.253886010362694,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n6_V6,194,1,193,14,7.253886010362694,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, REVEL_score, SpliceAI_DS",,Benign
+n7_V4,194,1,193,14,7.253886010362694,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n5_V13,194,1,193,13,6.7357512953367875,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score, SpliceAI_DS",,Benign
+n6_V12,194,1,193,13,6.7357512953367875,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n6_V13,194,1,193,13,6.7357512953367875,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n6_V3,194,1,193,13,6.7357512953367875,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, SpliceAI_DS",,Benign
+n7_V2,194,1,193,13,6.7357512953367875,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Benign
+n7_V3,194,1,193,13,6.7357512953367875,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Benign
+n7_V6,194,1,193,13,6.7357512953367875,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n8_V1,194,1,193,13,6.7357512953367875,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Benign
+n2_V2,832,418,414,233,56.28019323671498,"BayesDel_addAF_score, Eigen-PC-phred_coding",,Pathogenic
+n2_V17,832,418,414,227,54.830917874396135,"Eigen-PC-phred_coding, REVEL_score",,Pathogenic
+n2_V24,832,468,364,186,51.0989010989011,"MetaSVM_score, REVEL_score",,Pathogenic
+n2_V15,832,418,414,199,48.067632850241544,"Eigen-PC-phred_coding, MetaSVM_score",,Pathogenic
+n2_V8,832,138,694,319,45.96541786743516,"CADD_PHRED, Eigen-PC-phred_coding",,Pathogenic
+n3_V42,832,418,414,186,44.927536231884055,"Eigen-PC-phred_coding, MetaSVM_score, REVEL_score",,Pathogenic
+n2_V14,832,418,414,182,43.96135265700483,"Eigen-PC-phred_coding, GERP++_RS",,Pathogenic
+n2_V6,832,418,414,181,43.71980676328502,"BayesDel_addAF_score, REVEL_score",,Pathogenic
+n3_V10,832,418,414,180,43.47826086956522,"BayesDel_addAF_score, Eigen-PC-phred_coding, REVEL_score",,Pathogenic
+n2_V4,832,418,414,161,38.888888888888886,"BayesDel_addAF_score, MetaSVM_score",,Pathogenic
+n3_V8,832,418,414,159,38.405797101449274,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score",,Pathogenic
+n3_V17,832,418,414,155,37.43961352657005,"BayesDel_addAF_score, MetaSVM_score, REVEL_score",,Pathogenic
+n4_V21,832,418,414,155,37.43961352657005,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score, REVEL_score",,Pathogenic
+n2_V1,832,138,694,249,35.87896253602305,"BayesDel_addAF_score, CADD_PHRED",,Pathogenic
+n2_V3,832,418,414,143,34.54106280193237,"BayesDel_addAF_score, GERP++_RS",,Pathogenic
+n3_V7,832,418,414,143,34.54106280193237,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS",,Pathogenic
+n3_V1,832,138,694,233,33.57348703170029,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding",,Pathogenic
+n2_V21,832,418,414,137,33.091787439613526,"GERP++_RS, REVEL_score",,Pathogenic
+n3_V39,832,418,414,137,33.091787439613526,"Eigen-PC-phred_coding, GERP++_RS, REVEL_score",,Pathogenic
+n2_V12,832,138,694,228,32.85302593659942,"CADD_PHRED, REVEL_score",,Pathogenic
+n3_V25,832,138,694,227,32.70893371757925,"CADD_PHRED, Eigen-PC-phred_coding, REVEL_score",,Pathogenic
+n2_V19,832,418,414,128,30.917874396135264,"GERP++_RS, MetaSVM_score",,Pathogenic
+n3_V37,832,418,414,128,30.917874396135264,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score",,Pathogenic
+n3_V48,832,418,414,121,29.22705314009662,"GERP++_RS, MetaSVM_score, REVEL_score",,Pathogenic
+n4_V57,832,418,414,121,29.22705314009662,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score",,Pathogenic
+n2_V10,832,138,694,202,29.10662824207493,"CADD_PHRED, MetaSVM_score",,Pathogenic
+n3_V23,832,138,694,199,28.67435158501441,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score",,Pathogenic
+n3_V14,832,418,414,118,28.502415458937197,"BayesDel_addAF_score, GERP++_RS, REVEL_score",,Pathogenic
+n4_V18,832,418,414,118,28.502415458937197,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, REVEL_score",,Pathogenic
+n3_V32,832,138,694,186,26.80115273775216,"CADD_PHRED, MetaSVM_score, REVEL_score",,Pathogenic
+n4_V41,832,138,694,186,26.80115273775216,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, REVEL_score",,Pathogenic
+n3_V12,832,418,414,108,26.08695652173913,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score",,Pathogenic
+n4_V16,832,418,414,108,26.08695652173913,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score",,Pathogenic
+n3_V5,832,138,694,181,26.080691642651296,"BayesDel_addAF_score, CADD_PHRED, REVEL_score",,Pathogenic
+n4_V4,832,138,694,180,25.936599423631122,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, REVEL_score",,Pathogenic
+n2_V9,832,138,694,179,25.792507204610953,"CADD_PHRED, GERP++_RS",,Pathogenic
+n4_V27,832,418,414,106,25.603864734299517,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score, REVEL_score",,Pathogenic
+n5_V22,832,418,414,106,25.603864734299517,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score",,Pathogenic
+n3_V22,832,138,694,177,25.504322766570606,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS",,Pathogenic
+n3_V3,832,138,694,161,23.19884726224784,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score",,Pathogenic
+n4_V2,832,138,694,159,22.910662824207492,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score",,Pathogenic
+n4_V11,832,138,694,155,22.334293948126803,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score, REVEL_score",,Pathogenic
+n5_V6,832,138,694,155,22.334293948126803,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, REVEL_score",,Pathogenic
+n3_V2,832,138,694,143,20.605187319884728,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS",,Pathogenic
+n4_V1,832,138,694,143,20.605187319884728,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS",,Pathogenic
+n3_V29,832,138,694,137,19.740634005763688,"CADD_PHRED, GERP++_RS, REVEL_score",,Pathogenic
+n4_V38,832,138,694,137,19.740634005763688,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, REVEL_score",,Pathogenic
+n2_V13,832,77,755,145,19.205298013245034,"CADD_PHRED, SpliceAI_DS",,Pathogenic
+n3_V27,832,138,694,128,18.443804034582133,"CADD_PHRED, GERP++_RS, MetaSVM_score",,Pathogenic
+n4_V36,832,138,694,128,18.443804034582133,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score",,Pathogenic
+n4_V47,832,138,694,121,17.435158501440924,"CADD_PHRED, GERP++_RS, MetaSVM_score, REVEL_score",,Pathogenic
+n5_V37,832,138,694,121,17.435158501440924,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score",,Pathogenic
+n4_V8,832,138,694,118,17.002881844380404,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, REVEL_score",,Pathogenic
+n5_V3,832,138,694,118,17.002881844380404,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, REVEL_score",,Pathogenic
+n4_V6,832,138,694,108,15.561959654178674,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score",,Pathogenic
+n5_V1,832,138,694,108,15.561959654178674,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score",,Pathogenic
+n5_V12,832,138,694,106,15.27377521613833,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score, REVEL_score",,Pathogenic
+n6_V2,832,138,694,106,15.27377521613833,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score",,Pathogenic
+n2_V16,832,418,414,63,15.217391304347826,"Eigen-PC-phred_coding, phyloP100way_vertebrate",,Pathogenic
+n2_V26,832,418,414,59,14.251207729468598,"phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n3_V44,832,418,414,59,14.251207729468598,"Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n2_V5,832,418,414,56,13.526570048309178,"BayesDel_addAF_score, phyloP100way_vertebrate",,Pathogenic
+n3_V9,832,418,414,56,13.526570048309178,"BayesDel_addAF_score, Eigen-PC-phred_coding, phyloP100way_vertebrate",,Pathogenic
+n2_V20,832,418,414,55,13.285024154589372,"GERP++_RS, phyloP100way_vertebrate",,Pathogenic
+n3_V38,832,418,414,55,13.285024154589372,"Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate",,Pathogenic
+n2_V23,832,418,414,54,13.043478260869565,"MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n3_V41,832,418,414,54,13.043478260869565,"Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n3_V53,832,418,414,54,13.043478260869565,"MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n4_V62,832,418,414,54,13.043478260869565,"Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n3_V19,832,418,414,53,12.801932367149758,"BayesDel_addAF_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n4_V23,832,418,414,53,12.801932367149758,"BayesDel_addAF_score, Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n3_V50,832,418,414,51,12.318840579710145,"GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n4_V59,832,418,414,51,12.318840579710145,"Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n3_V13,832,418,414,50,12.077294685990339,"BayesDel_addAF_score, GERP++_RS, phyloP100way_vertebrate",,Pathogenic
+n4_V17,832,418,414,50,12.077294685990339,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate",,Pathogenic
+n3_V16,832,418,414,49,11.83574879227053,"BayesDel_addAF_score, MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n4_V20,832,418,414,49,11.83574879227053,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n4_V32,832,418,414,49,11.83574879227053,"BayesDel_addAF_score, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n5_V27,832,418,414,49,11.83574879227053,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n4_V29,832,418,414,47,11.352657004830919,"BayesDel_addAF_score, GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n5_V24,832,418,414,47,11.352657004830919,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n3_V47,832,418,414,46,11.11111111111111,"GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n4_V56,832,418,414,46,11.11111111111111,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n4_V66,832,418,414,46,11.11111111111111,"GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n5_V51,832,418,414,46,11.11111111111111,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n4_V26,832,418,414,43,10.38647342995169,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n5_V21,832,418,414,43,10.38647342995169,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n5_V31,832,418,414,43,10.38647342995169,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n6_V16,832,418,414,43,10.38647342995169,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n2_V11,832,138,694,62,8.93371757925072,"CADD_PHRED, phyloP100way_vertebrate",,Pathogenic
+n3_V24,832,138,694,62,8.93371757925072,"CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate",,Pathogenic
+n2_V18,832,193,639,57,8.92018779342723,"Eigen-PC-phred_coding, SpliceAI_DS",,Pathogenic
+n3_V34,832,138,694,59,8.501440922190202,"CADD_PHRED, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n4_V43,832,138,694,59,8.501440922190202,"CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n3_V4,832,138,694,56,8.069164265129682,"BayesDel_addAF_score, CADD_PHRED, phyloP100way_vertebrate",,Pathogenic
+n4_V3,832,138,694,56,8.069164265129682,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate",,Pathogenic
+n3_V28,832,138,694,54,7.780979827089337,"CADD_PHRED, GERP++_RS, phyloP100way_vertebrate",,Pathogenic
+n3_V31,832,138,694,54,7.780979827089337,"CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n4_V37,832,138,694,54,7.780979827089337,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate",,Pathogenic
+n4_V40,832,138,694,54,7.780979827089337,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n4_V52,832,138,694,54,7.780979827089337,"CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n5_V42,832,138,694,54,7.780979827089337,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n4_V13,832,138,694,53,7.636887608069165,"BayesDel_addAF_score, CADD_PHRED, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n5_V8,832,138,694,53,7.636887608069165,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n3_V26,832,77,755,56,7.417218543046357,"CADD_PHRED, Eigen-PC-phred_coding, SpliceAI_DS",,Pathogenic
+n4_V49,832,138,694,51,7.348703170028818,"CADD_PHRED, GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n5_V39,832,138,694,51,7.348703170028818,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n4_V7,832,138,694,50,7.204610951008646,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, phyloP100way_vertebrate",,Pathogenic
+n5_V2,832,138,694,50,7.204610951008646,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate",,Pathogenic
+n4_V10,832,138,694,49,7.060518731988473,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n5_V17,832,138,694,49,7.060518731988473,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n5_V5,832,138,694,49,7.060518731988473,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n6_V7,832,138,694,49,7.060518731988473,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n5_V14,832,138,694,47,6.772334293948127,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n6_V4,832,138,694,47,6.772334293948127,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n4_V46,832,138,694,46,6.628242074927954,"CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n5_V36,832,138,694,46,6.628242074927954,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n5_V46,832,138,694,46,6.628242074927954,"CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n6_V22,832,138,694,46,6.628242074927954,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n2_V7,832,193,639,42,6.572769953051643,"BayesDel_addAF_score, SpliceAI_DS",,Pathogenic
+n5_V11,832,138,694,43,6.195965417867435,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n6_V1,832,138,694,43,6.195965417867435,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate",,Pathogenic
+n6_V11,832,138,694,43,6.195965417867435,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n7_V1,832,138,694,43,6.195965417867435,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score",,Pathogenic
+n2_V28,832,203,629,38,6.041335453100159,"REVEL_score, SpliceAI_DS",,Pathogenic
+n3_V46,832,193,639,38,5.94679186228482,"Eigen-PC-phred_coding, REVEL_score, SpliceAI_DS",,Pathogenic
+n3_V6,832,77,755,42,5.562913907284768,"BayesDel_addAF_score, CADD_PHRED, SpliceAI_DS",,Pathogenic
+n3_V11,832,193,639,35,5.477308294209703,"BayesDel_addAF_score, Eigen-PC-phred_coding, SpliceAI_DS",,Pathogenic
+n2_V25,832,203,629,33,5.246422893481717,"MetaSVM_score, SpliceAI_DS",,Pathogenic
+n3_V43,832,193,639,33,5.164319248826291,"Eigen-PC-phred_coding, MetaSVM_score, SpliceAI_DS",,Pathogenic
+n3_V36,832,77,755,38,5.033112582781457,"CADD_PHRED, REVEL_score, SpliceAI_DS",,Pathogenic
+n4_V45,832,77,755,38,5.033112582781457,"CADD_PHRED, Eigen-PC-phred_coding, REVEL_score, SpliceAI_DS",,Pathogenic
+n3_V55,832,203,629,31,4.92845786963434,"MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n4_V64,832,193,639,31,4.851330203442879,"Eigen-PC-phred_coding, MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n4_V5,832,77,755,35,4.635761589403973,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, SpliceAI_DS",,Pathogenic
+n2_V22,832,193,639,28,4.381846635367762,"GERP++_RS, SpliceAI_DS",,Pathogenic
+n3_V33,832,77,755,33,4.370860927152318,"CADD_PHRED, MetaSVM_score, SpliceAI_DS",,Pathogenic
+n4_V42,832,77,755,33,4.370860927152318,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, SpliceAI_DS",,Pathogenic
+n3_V40,832,193,639,27,4.225352112676056,"Eigen-PC-phred_coding, GERP++_RS, SpliceAI_DS",,Pathogenic
+n4_V54,832,77,755,31,4.105960264900662,"CADD_PHRED, MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V44,832,77,755,31,4.105960264900662,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n3_V21,832,193,639,25,3.912363067292645,"BayesDel_addAF_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n4_V25,832,193,639,25,3.912363067292645,"BayesDel_addAF_score, Eigen-PC-phred_coding, REVEL_score, SpliceAI_DS",,Pathogenic
+n3_V30,832,77,755,28,3.7086092715231787,"CADD_PHRED, GERP++_RS, SpliceAI_DS",,Pathogenic
+n3_V18,832,193,639,23,3.599374021909233,"BayesDel_addAF_score, MetaSVM_score, SpliceAI_DS",,Pathogenic
+n4_V22,832,193,639,23,3.599374021909233,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score, SpliceAI_DS",,Pathogenic
+n4_V34,832,193,639,23,3.599374021909233,"BayesDel_addAF_score, MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V29,832,193,639,23,3.599374021909233,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n4_V39,832,77,755,27,3.576158940397351,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, SpliceAI_DS",,Pathogenic
+n4_V15,832,77,755,25,3.3112582781456954,"BayesDel_addAF_score, CADD_PHRED, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V10,832,77,755,25,3.3112582781456954,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, REVEL_score, SpliceAI_DS",,Pathogenic
+n4_V12,832,77,755,23,3.0463576158940397,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score, SpliceAI_DS",,Pathogenic
+n5_V19,832,77,755,23,3.0463576158940397,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V7,832,77,755,23,3.0463576158940397,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, SpliceAI_DS",,Pathogenic
+n6_V9,832,77,755,23,3.0463576158940397,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n3_V15,832,193,639,17,2.6604068857589986,"BayesDel_addAF_score, GERP++_RS, SpliceAI_DS",,Pathogenic
+n3_V49,832,193,639,17,2.6604068857589986,"GERP++_RS, MetaSVM_score, SpliceAI_DS",,Pathogenic
+n3_V52,832,193,639,17,2.6604068857589986,"GERP++_RS, REVEL_score, SpliceAI_DS",,Pathogenic
+n4_V19,832,193,639,17,2.6604068857589986,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, SpliceAI_DS",,Pathogenic
+n4_V58,832,193,639,17,2.6604068857589986,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, SpliceAI_DS",,Pathogenic
+n4_V61,832,193,639,17,2.6604068857589986,"Eigen-PC-phred_coding, GERP++_RS, REVEL_score, SpliceAI_DS",,Pathogenic
+n4_V68,832,193,639,15,2.347417840375587,"GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V53,832,193,639,15,2.347417840375587,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n4_V48,832,77,755,17,2.251655629139073,"CADD_PHRED, GERP++_RS, MetaSVM_score, SpliceAI_DS",,Pathogenic
+n4_V51,832,77,755,17,2.251655629139073,"CADD_PHRED, GERP++_RS, REVEL_score, SpliceAI_DS",,Pathogenic
+n4_V9,832,77,755,17,2.251655629139073,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, SpliceAI_DS",,Pathogenic
+n5_V38,832,77,755,17,2.251655629139073,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, SpliceAI_DS",,Pathogenic
+n5_V4,832,77,755,17,2.251655629139073,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, SpliceAI_DS",,Pathogenic
+n5_V41,832,77,755,17,2.251655629139073,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V48,832,77,755,15,1.9867549668874172,"CADD_PHRED, GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n6_V24,832,77,755,15,1.9867549668874172,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n4_V28,832,193,639,11,1.7214397496087637,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score, SpliceAI_DS",,Pathogenic
+n4_V31,832,193,639,11,1.7214397496087637,"BayesDel_addAF_score, GERP++_RS, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V23,832,193,639,11,1.7214397496087637,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, SpliceAI_DS",,Pathogenic
+n5_V26,832,193,639,11,1.7214397496087637,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V33,832,193,639,11,1.7214397496087637,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n6_V18,832,193,639,11,1.7214397496087637,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V13,832,77,755,11,1.4569536423841059,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score, SpliceAI_DS",,Pathogenic
+n5_V16,832,77,755,11,1.4569536423841059,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, REVEL_score, SpliceAI_DS",,Pathogenic
+n6_V13,832,77,755,11,1.4569536423841059,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n6_V3,832,77,755,11,1.4569536423841059,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, SpliceAI_DS",,Pathogenic
+n6_V6,832,77,755,11,1.4569536423841059,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, REVEL_score, SpliceAI_DS",,Pathogenic
+n7_V3,832,77,755,11,1.4569536423841059,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, REVEL_score, SpliceAI_DS",,Pathogenic
+n2_V27,832,193,639,5,0.7824726134585289,"phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n3_V20,832,193,639,5,0.7824726134585289,"BayesDel_addAF_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n3_V45,832,193,639,5,0.7824726134585289,"Eigen-PC-phred_coding, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n3_V54,832,193,639,5,0.7824726134585289,"MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n3_V56,832,193,639,5,0.7824726134585289,"phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n4_V24,832,193,639,5,0.7824726134585289,"BayesDel_addAF_score, Eigen-PC-phred_coding, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n4_V33,832,193,639,5,0.7824726134585289,"BayesDel_addAF_score, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n4_V35,832,193,639,5,0.7824726134585289,"BayesDel_addAF_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n4_V63,832,193,639,5,0.7824726134585289,"Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n4_V65,832,193,639,5,0.7824726134585289,"Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n4_V70,832,193,639,5,0.7824726134585289,"MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V28,832,193,639,5,0.7824726134585289,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n5_V30,832,193,639,5,0.7824726134585289,"BayesDel_addAF_score, Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V35,832,193,639,5,0.7824726134585289,"BayesDel_addAF_score, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V55,832,193,639,5,0.7824726134585289,"Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n6_V20,832,193,639,5,0.7824726134585289,"BayesDel_addAF_score, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n3_V35,832,77,755,5,0.6622516556291391,"CADD_PHRED, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n4_V14,832,77,755,5,0.6622516556291391,"BayesDel_addAF_score, CADD_PHRED, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n4_V44,832,77,755,5,0.6622516556291391,"CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n4_V53,832,77,755,5,0.6622516556291391,"CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n4_V55,832,77,755,5,0.6622516556291391,"CADD_PHRED, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V18,832,77,755,5,0.6622516556291391,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n5_V20,832,77,755,5,0.6622516556291391,"BayesDel_addAF_score, CADD_PHRED, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V43,832,77,755,5,0.6622516556291391,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n5_V45,832,77,755,5,0.6622516556291391,"CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V50,832,77,755,5,0.6622516556291391,"CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V9,832,77,755,5,0.6622516556291391,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n6_V10,832,77,755,5,0.6622516556291391,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n6_V15,832,77,755,5,0.6622516556291391,"BayesDel_addAF_score, CADD_PHRED, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n6_V26,832,77,755,5,0.6622516556291391,"CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n6_V8,832,77,755,5,0.6622516556291391,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n7_V5,832,77,755,5,0.6622516556291391,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n3_V51,832,193,639,3,0.4694835680751174,"GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n4_V30,832,193,639,3,0.4694835680751174,"BayesDel_addAF_score, GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n4_V60,832,193,639,3,0.4694835680751174,"Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n4_V67,832,193,639,3,0.4694835680751174,"GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n4_V69,832,193,639,3,0.4694835680751174,"GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V25,832,193,639,3,0.4694835680751174,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n5_V32,832,193,639,3,0.4694835680751174,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n5_V34,832,193,639,3,0.4694835680751174,"BayesDel_addAF_score, GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V52,832,193,639,3,0.4694835680751174,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n5_V54,832,193,639,3,0.4694835680751174,"Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n5_V56,832,193,639,3,0.4694835680751174,"GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n6_V17,832,193,639,3,0.4694835680751174,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n6_V19,832,193,639,3,0.4694835680751174,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n6_V21,832,193,639,3,0.4694835680751174,"BayesDel_addAF_score, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n6_V28,832,193,639,3,0.4694835680751174,"Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n7_V7,832,193,639,3,0.4694835680751174,"BayesDel_addAF_score, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n4_V50,832,77,755,3,0.3973509933774834,"CADD_PHRED, GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n5_V15,832,77,755,3,0.3973509933774834,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n5_V40,832,77,755,3,0.3973509933774834,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n5_V47,832,77,755,3,0.3973509933774834,"CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n5_V49,832,77,755,3,0.3973509933774834,"CADD_PHRED, GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n6_V12,832,77,755,3,0.3973509933774834,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n6_V14,832,77,755,3,0.3973509933774834,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n6_V23,832,77,755,3,0.3973509933774834,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n6_V25,832,77,755,3,0.3973509933774834,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n6_V27,832,77,755,3,0.3973509933774834,"CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n6_V5,832,77,755,3,0.3973509933774834,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n7_V2,832,77,755,3,0.3973509933774834,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, SpliceAI_DS",,Pathogenic
+n7_V4,832,77,755,3,0.3973509933774834,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n7_V6,832,77,755,3,0.3973509933774834,"BayesDel_addAF_score, CADD_PHRED, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n7_V8,832,77,755,3,0.3973509933774834,"CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic
+n8_V1,832,77,755,3,0.3973509933774834,"BayesDel_addAF_score, CADD_PHRED, Eigen-PC-phred_coding, GERP++_RS, MetaSVM_score, phyloP100way_vertebrate, REVEL_score, SpliceAI_DS",,Pathogenic

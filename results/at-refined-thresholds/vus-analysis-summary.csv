@@ -1,0 +1,9 @@
+Tool,vus_cnt,p_cnt,b_cnt,na_cnt
+BayesDel_addAF_score,196,154,175,76
+CADD_PHRED,0,399,182,20
+Eigen-PC-phred_coding,0,304,221,76
+GERP++_RS,219,198,108,76
+MetaSVM_score,106,205,214,76
+phyloP100way_vertebrate,296,58,171,76
+REVEL_score,66,188,271,76
+SpliceAI_DS,0,98,371,132

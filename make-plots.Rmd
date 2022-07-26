@@ -1,0 +1,1265 @@
+---
+title: "make-plots"
+output:
+  html_document:
+  pdf_document: default
+params:
+  f1: ./vep-results-clean-and-extended.csv
+  f2.1: ./results/performance-evaluation-continuous.xlsx
+  f2.2: ./results/performance-evaluation-splicing.xlsx
+  f2.3: ./results/performance-evaluation-subsets.xlsx
+  f3.1: ./results/mcc-maximizing-thresholds.csv
+  f3.2: ./results/mcc-maximizing-thresholds-splicing-1.csv
+  f3.3: ./results/mcc-maximizing-thresholds-splicing-2.csv
+  f4: ./results/pathogenic_binary.csv
+  f5: ./results/benign_binary.csv
+  f6.1: ./results/at-refined-thresholds/concordance.csv
+  f6.2: ./results/at-refined-thresholds/concordance-rate.csv
+  f7: ./results/at-refined-thresholds/vus-analysis-summary.csv
+  annotations_path: ./annotations
+  output_path: ./results
+  plot_path: ./plots
+---
+
+```{r eval = FALSE, echo = FALSE}
+rmarkdown::render('make-plots.Rmd', params=params)
+```
+
+```{r echo = FALSE, warning = FALSE}
+box::use(
+  dplyr[d_filter = filter, d_select = select, d_rename = rename, ...],
+  # for unite
+  tidyr[...],
+  # for enframe  
+  tibble[...],
+  patchwork[...],
+  cowplot[...],
+  # for map_chr
+  purrr[...],
+  stringr[...],
+  readr[...],
+  knitr[...],
+  # For pretty-printed tables
+  pander[...],
+  readxl[...], 
+  xlsx[write.xlsx],
+  ggplot2[...],
+  grid[...],
+  DT[...],
+  ggupset[...],
+  )
+
+# Get ggplot colours
+gg_color_hue <- function(n) {
+    x <- c('ggplot2')
+    lapply(x, suppressMessages(library), character.only=T)
+    
+    hues = seq(15, 375, length=n+1)
+    hcl(h=hues, l=65, c=100)[1:n]
+}
+
+paper_colors = c("#6c81d9", "#A6B3E8", # blue hues
+                 "#45c097", "#8FD9C0", # green hues
+                 "#c99f3b", "#E4CE9C",  # yellow hues
+                 "#c169ba", "#D9A5D5",  # purple hues
+                 "#c0456e", "#D98FA8" # red hues
+                 )
+plot_colors = setNames(c("#f25c8c", "#f2c25c", "#56c6a0"), c("HBA1", "HBA2", "HBB"))
+divergent_colors = colorRampPalette(c('#8a57a1', 'white', '#6ea157'))(50)
+
+```
+
+```{r import-data, include = FALSE}
+effect_cat_mapping = setNames(c("Regulatory", "Regulatory",
+                                "Initiation", "Frameshift",
+                                "Stop gained", "Splicing",
+                                "Synonymous", "Splicing",
+                                "Splicing", "Missense",
+                                "Splicing", "Splicing",
+                                "Splicing", "Splicing",
+                                "Splicing", "Splicing",
+                                "Splicing", "Splicing",
+                                "Frameshift", "Inframe indels",
+                                "Splicing", "Unknown effect",
+                                "Regulatory", "Regulatory", 
+                                "Splicing", "Stop lost", 
+                                "Regulatory", "Stop gained", 
+                                "Splicing", "Splicing", "Splicing"),
+                              c("Promoter", "5'UTR",
+                                "Initiation codon", "Frameshift",
+                                "Stop gained", "Cryptic splice site; Missense codons",
+                                "Synonymous substitution", "Missense codons; Cryptic splice site",
+                                "Cryptic splice site; Synonymous substitution", "Missense codons",
+                                "Splice region variant; Synonymous substitution", "Splice region variant; Missense codons",
+                                "Splice donor", "Splice region variant",
+                                "Cryptic splice site", "Splice acceptor",
+                                "Splice region variant; Splice acceptor", "Splice region variant; Inframe indels",
+                                "Splice region variant; Frameshift", "Inframe indels",
+                                "Splice region variant; Splice donor", "NA",
+                                "Other 3'UTR site", "RNA cleavage - Poly(A) signal",
+                                "Splice region variant; Splice acceptor; Inframe indels", "Stop lost",
+                                "Downstream transcript variant", "Splice region variant; Stop gained", 
+                                # the following are coming from params$f1
+                                "Missense codons, Cryptic splice site", "Cryptic splice site, Synonymous substitution", "Splice region variant, Inframe indels")
+                              )
+# here only used for mapping tool name with formatted 
+tool_names_formatted = tibble(Tool = c("SIFT_score","integrated_fitCons_score","MutationTaster_score",
+                                  "LRT_score", "PolyPhen_score","SpliceAI_DS",
+                                  "ClinPred_score", "DANN_score","LIST-S2_score_seperated",
+                                  "MetaSVM_score", "MutPred_score","REVEL_score",
+                                  "VEST4_score_seperated", "fathmm-MKL_coding_score","ada_score",
+                                  "rf_score","Condel_score","MetaLR_score",
+                                  "GERP++_RS", "Eigen-PC-phred_coding", 
+                                  "BayesDel_addAF_score", "FATHMM_score_seperated", "MutationAssessor_standalone_score",
+                                  "PROVEAN_score_seperated", "CADD_PHRED", 
+                                  "phyloP100way_vertebrate", "phyloP30way_mammalian", 
+                                  "phastCons30way_mammalian", "phastCons17way_primate",
+                                  "SiPhy_29way_logOdds", "Eigen-phred_coding"),
+                             formatted_name = c('SIFT', 'fitCons', 'MutationTaster', 
+                                                'LRT', 'PolyPhen-2', 'SpliceAI', 
+                                                'ClinPred', 'DANN', 'LIST-S2', 
+                                                'Meta-SVM', 'MutPred2', 'REVEL', 
+                                                'VEST4', 'FATHMM-MKL', 'ada_score', 
+                                                'rf_score', 'CONDEL', 'MetaLR', 
+                                                'GERP++', 'EIGEN-PC', 
+                                                'BayesDel', 'FATHMM', 'MutationAssessor', 
+                                                'PROVEAN', 'CADD',
+                                                "phyloP100", "phyloP30", 
+                                                "phastCons30", "phastCons17",
+                                                "SiPhy_29logOdds", "Eigen"
+                               ))
+
+ds = read_csv(params$f1) %>%
+  mutate(pathogenicity = recode(Observed_pathogenicity, !!!setNames(
+    c("P/LP", "VUS", "B/LB", "B/LB", "VUS"),
+    c("Pathogenic/Likely Pathogenic", "Uncertain significance", "Benign/Likely Benign", "Benign/Likely benign", "Uncertain Significance"))), 
+    Effect_function = ifelse(is.na(Effect_function), "NA", Effect_function),
+    effect = recode(Effect_function, !!!effect_cat_mapping)) %>%
+  separate(Location, c('Chr', 'Pos'), sep=":") %>%
+  separate(Pos, c('StartPos', 'EndPos'), sep="-") %>%
+  mutate(across(c('Chr', 'StartPos', 'EndPos'), ~as.double(.))) %>%
+  d_select(ithaID, HGVS, Chr, StartPos, EndPos, pathogenicity, effect)
+```
+# Descriptive analysis of SNVs - Figure 2 
+
+```{r figure-2, echo=FALSE, warning=FALSE, message=FALSE, eval=T}
+ithaid_f_gene = read_csv(file.path(params$annotations_path, "ithaid_f_gene.csv"))
+
+plot_data_base = ds %>% 
+  left_join(ithaid_f_gene, by="ithaID") %>%
+  distinct(HGVS, .keep_all = T) %>%
+  mutate(Gene = ifelse(is.na(hugo_name) | hugo_name == '', name, hugo_name)) %>%
+  d_rename(gene_name = name)
+
+plot_data = plot_data_base %>%  
+  group_by(pathogenicity, Gene, effect) %>%
+  mutate(cnt = n()) %>%
+  group_by(pathogenicity, effect) %>%
+  mutate(group_total = n(), 
+         Percent = cnt / group_total * 100) %>%
+  d_select(Gene, effect, pathogenicity, cnt, group_total, Percent) %>%
+  d_rename(Effect = effect) %>%
+  distinct() %>%
+  mutate(Gene = str_replace(Gene, "α", "\u03b1")) %>%
+  ungroup() %>%
+  mutate(Effect = factor(Effect, levels = rev(sort(unique(Effect))))) %>%
+  arrange(Gene)
+
+p1 = ggplot(plot_data, aes(x= Effect, fill = Gene)) + 
+  geom_bar(aes(y = Percent), stat="identity", position="stack") +
+  geom_text(aes(y= Percent, label = cnt),  position = position_stack(vjust=0.5), size=3) +
+  coord_flip() +
+  xlab("") + ylab("") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  facet_wrap(~pathogenicity, scales = "free_x") + 
+  scale_fill_manual(values=plot_colors) +
+  theme_cowplot(font_size = 10) + 
+  theme(legend.position="bottom", 
+        panel.spacing = unit(1.5, "lines"))
+
+dir.create(file.path(params$plot_path, "plot-source-files"))
+write.xlsx(plot_data_base %>% as.data.frame(), 
+           file.path(params$plot_path, "plot-source-files",
+                     "Figure-2-data.xlsx"), 
+           sheetName = str_c("Panel A - Source data"),
+           row.names = F, append = F)
+write.xlsx(plot_data %>% as.data.frame(), 
+           file.path(params$plot_path, "plot-source-files",
+                     "Figure-2-data.xlsx"), 
+           sheetName = str_c("Panel A - Summary data"),
+           row.names = F, append = T)
+####
+
+ithaid_f_hemo = read_csv(file.path(params$annotations_path, "ithaid_f_hemo.csv"))
+
+plot_data = plot_data_base %>%
+  left_join(ithaid_f_hemo, by="ithaID") %>%
+  group_by(ithaID, HGVS, Gene, pathogenicity) %>% 
+  summarise(Type = str_c(sort(unique(type)), collapse = ' and ')) %>%
+  # there is one ithaid with empty Type and that is 3043 that was merged with 2171
+  d_filter(Type != '') %>%
+  mutate(Gene = str_replace(Gene, "α", "\u03b1")) %>%
+  d_filter(Type != "Unknown")
+
+p2 = ggplot(plot_data, aes(x = Type, fill = Gene)) +
+  geom_bar(aes(y = (..count..)))  +
+  coord_flip() +
+  # with limits= force I am droping unused levels from the legend
+  scale_fill_manual(values=plot_colors, limits=force) +
+  theme_cowplot(font_size = 10) + 
+  theme(legend.position="bottom") +
+  labs(y = "Count", x="")
+
+source_data = plot_data_base %>% left_join(ithaid_f_hemo, by="ithaID")
+write.xlsx(source_data %>% as.data.frame(), 
+           file.path(params$plot_path, "plot-source-files",
+                     "Figure-2-data.xlsx"), 
+           sheetName = str_c("Panel B - Source data"),
+           row.names = F, append = T)
+write.xlsx(plot_data %>% as.data.frame(), 
+           file.path(params$plot_path, "plot-source-files",
+                     "Figure-2-data.xlsx"), 
+           sheetName = str_c("Panel B - Summary data"),
+           row.names = F, append = T)
+
+###
+
+ithaid_f_phenotype = read_csv(file.path(params$annotations_path, "ithaid_f_phenotype.csv"))
+
+plot_data = plot_data_base %>%
+  left_join(ithaid_f_phenotype, by="ithaID") %>%
+  group_by(ithaID, HGVS, pathogenicity) %>% 
+  d_select(ithaID, HGVS, Gene, type, subtype, name) %>%
+  d_filter(type %in% c('Structural Hb')) %>%
+  mutate(Gene = str_replace(Gene, "α", "\u03b1")) %>%
+  d_filter(!is.na(subtype)) %>%
+  mutate(name = str_replace(name, "Oxygen", "\nOxygen"))
+
+p3 = ggplot(plot_data %>% d_filter(subtype =="oxygen"), aes(x = name, fill = Gene)) +
+  geom_bar(aes(y = (..count..))) + 
+  coord_flip() +
+  # with limits = force I am droping unused levels from the legend
+  scale_fill_manual(values=plot_colors, limits=force) +
+  scale_x_discrete(labels = c(expression(Decreased~O[2]),expression(Increased~O[2]))) +
+  labs(y = "Count", x = "") +
+  theme_cowplot(font_size = 10) + 
+  theme(legend.position="bottom",
+        axis.text.x = element_text(angle = 0)) 
+
+source_data = plot_data_base %>% 
+  left_join(ithaid_f_phenotype, by="ithaID") %>%
+  d_filter(subtype =="oxygen")
+write.xlsx(source_data %>% as.data.frame(), 
+           file.path(params$plot_path, "plot-source-files",
+                     "Figure-2-data.xlsx"), 
+           sheetName = str_c("Panel D - Source data"),
+           row.names = F, append = T)
+
+p4 = ggplot(plot_data %>% d_filter(subtype == "stability"), aes(x = name, fill = Gene)) +
+  geom_bar(aes(y = (..count..))) + 
+  coord_flip() +
+  # with limits = force I am droping unused levels from the legend
+  scale_fill_manual(values=plot_colors, limits=force) +
+  labs(x = "", y = "Count") +
+  theme_cowplot(font_size = 10) + 
+  theme(legend.position="bottom",
+        axis.text.x = element_text(angle = 0)) 
+
+source_data = plot_data_base %>% 
+  left_join(ithaid_f_phenotype, by="ithaID") %>%
+   d_filter(subtype == "stability")
+write.xlsx(source_data %>% as.data.frame(), 
+           file.path(params$plot_path, "plot-source-files",
+                     "Figure-2-data.xlsx"), 
+           sheetName = str_c("Panel E - Source data"),
+           row.names = F, append = T)
+
+###
+
+plot_data = plot_data_base %>%
+  left_join(ithaid_f_phenotype, by="ithaID") %>%
+  group_by(ithaID, HGVS, pathogenicity) %>% 
+  d_select(ithaID, HGVS, Gene, type, subtype, name) %>%
+  d_filter(type %in% c('Thalassaemia')) %>%
+  mutate(name = str_replace(name, "α", "\u03b1"),
+         name = str_replace(name, "β", "\u03b2"), 
+         name = str_replace(name, 
+                            stringi::stri_unescape_unicode(paste0("\\u", "207A")), 
+                            "+")
+         )
+                              
+plot_data$name = factor(plot_data$name, 
+                          levels = rev(c("β0","β0 / β+","β+",
+                            "β++","β++ (silent)","α0",
+                            "α+/α0","α+")))
+
+p5 = ggplot(plot_data, aes(x = name, fill = Gene)) +
+  geom_bar(aes(y = (..count..))) + 
+  coord_flip() +
+  # with limits = force I am droping unused levels from the legend
+  scale_fill_manual(values=plot_colors, limits=force) +
+  labs(x = "", y = "Count") +
+  theme_cowplot(font_size = 10) + 
+  theme(legend.position="bottom") 
+
+source_data = plot_data_base %>% 
+  left_join(ithaid_f_phenotype, by="ithaID") %>%
+   d_filter(type %in% c('Thalassaemia')) 
+write.xlsx(source_data %>% as.data.frame(), 
+           file.path(params$plot_path, "plot-source-files",
+                     "Figure-2-data.xlsx"), 
+           sheetName = str_c("Panel C - Source data"),
+           row.names = F, append = T)
+
+###
+
+ithaid_f_mol_mech = read_csv(file.path(params$annotations_path, "ithaid_f_mol_mech.csv"))
+
+plot_data = plot_data_base %>%
+  left_join(ithaid_f_mol_mech, by="ithaID") %>%
+  group_by(ithaID, HGVS, pathogenicity) %>% 
+  d_select(ithaID, HGVS, Gene, name) %>% 
+  mutate(Gene = str_replace(Gene, "α", "\u03b1"),
+         name = str_replace(name, "α", "\u03b1"),
+         name = str_replace(name, "β", "\u03b2")
+         ) %>%
+  d_filter(!is.na(name))
+
+p6 = ggplot(plot_data, aes(x = name, fill = Gene)) +
+  geom_bar(aes(y = (..count..))) + 
+  coord_flip() +
+  # with limits = force I am droping unused levels from the legend
+  scale_fill_manual(values=plot_colors, limits=force) +
+  labs(x = "", y = "Count") +
+  theme_cowplot(font_size = 10) + 
+  theme(legend.position="none",
+        axis.text.x = element_text(angle = 0)) 
+
+source_data = plot_data_base %>% 
+  left_join(ithaid_f_mol_mech, by="ithaID") %>%
+  d_filter(!is.na(name))
+write.xlsx(source_data %>% as.data.frame(), 
+           file.path(params$plot_path, "plot-source-files",
+                     "Figure-2-data.xlsx"), 
+           sheetName = str_c("Panel F - Source data"),
+           row.names = F, append = T)
+###
+
+p_comb = p1 + p2 + p5 + p3 + p4 + p6 + guide_area() + 
+  plot_layout(guides="collect", design ="AAA\nAAA\nAAA\nAAA\nAAA\nBCC\nBCC\nDFF\nEFF\nGGG") +
+  plot_annotation(tag_levels = "A")
+ggsave(file.path(params$plot_path, "Figure_2.pdf"), 
+       p_comb,  
+       width = 210,
+       height = 210,
+       units = "mm",
+       device = cairo_pdf,
+       dpi="retina")
+
+```
+# LR plots
+
+```{r LR-plots, echo=FALSE, warning=FALSE, message=FALSE}
+wrap_plotting = function(ds, subset_label, f_vlines, plot_all = T){
+  
+  dir.create(file.path(params$plot_path, str_c(subset_label, "-subset")))
+  
+  th_increment_type = ds %>%
+    group_by(Tool) %>%
+    summarise(tmp = max(Threshold)) %>% mutate(discrete = ifelse(tmp == 0.95, TRUE, FALSE))
+
+  thresholds_vlines = map(f_vlines, read_csv) %>%
+    Reduce(function(df1, df2) bind_rows(as_tibble(df1), as_tibble(df2)), .) %>%
+    d_rename(mcc_maximixing_th = Threshold) %>%
+    d_select(-MCC) %>%
+    full_join(tool_names_formatted, by = "Tool")
+  
+  
+  # based on the Bayesian framework 
+  evidence_strength = tibble(strength =  c("Very Strong", "Strong", "Moderate", "Supporting"),
+                             value = c(350, 18.7, 4.3, 2.08))
+  
+  ds_hlines = tibble(Tool = (ds %>% .[['Tool']] %>% as.factor() %>% levels()), 
+                     upper_bound = ds %>% group_by(Tool) %>% summarise(tmp = max(`LR+`)) %>% .[['tmp']], 
+                     lower_bound = ds %>% group_by(Tool) %>% summarise(tmp = min(`LR-`)) %>% .[['tmp']], 
+                     xmin = ds %>% group_by(Tool) %>% summarise(tmp = min(Threshold)) %>% .[['tmp']], 
+                     ) %>%
+    mutate( supporting_plus = case_when(upper_bound >= 2.08 | upper_bound >= (2.08 - 5)  ~ 2.08), 
+            moderate_plus = case_when(upper_bound >= 4.3 | upper_bound >= (4.3 - 5)  ~ 4.3), 
+            strong_plus = case_when(upper_bound >= 18.7 | upper_bound >= (18.7 - 5)  ~ 18.7), 
+            vstrong_plus = case_when(upper_bound >= 350 | upper_bound >= (350 - 5)  ~ 350), 
+            supporting_minus = case_when(lower_bound <= (1/2.08) | lower_bound <= ((1/2.08) + 0.1)  ~ 1/2.08), 
+            # removing moderate benign as that doesn't exist
+            #moderate_minus = case_when(lower_bound <= (1/4.3) | lower_bound <= ((1/4.3) + 0.1)  ~ 1/4.3), 
+            strong_minus = case_when(lower_bound <= (1/18.7) | lower_bound <= ((1/18.7) + 0.05)  ~ 1/18.7), 
+            vstrong_minus = case_when(lower_bound <= (1/350) | lower_bound <= ((1/350) + 0.005)  ~ 1/350), 
+           )
+
+  lr_ci_lb = ds %>%
+    group_by(Tool) %>%
+    pivot_longer(c(`LR+_CI_lower`, `LR-_CI_lower`), names_to = "tmp", values_to = "ymin") %>% 
+    separate(tmp, c("test", "tmp"), sep="_", extra="drop") %>%
+    d_select(Threshold, ymin, test) 
+  
+  lr_ci_ub = ds %>%
+    group_by(Tool) %>%
+    pivot_longer(c(`LR+_CI_upper`, `LR-_CI_upper`), names_to = "tmp", values_to = "ymax") %>% 
+    separate(tmp, c("test", "tmp"), sep="_", extra="drop") %>%
+    d_select(Threshold, ymax, test)
+  
+  plot_data = ds %>% 
+    d_filter(Tool %in% (th_increment_type %>% d_filter(discrete == TRUE) %>% .[['Tool']])) %>%
+    group_by(Tool) %>% 
+    pivot_longer(c("LR+", "LR-"), names_to = 'test', values_to = 'Value') %>%
+    d_select(Threshold, Value, test) %>%
+    left_join(ds_hlines, by="Tool") %>%
+    left_join(thresholds_vlines, by="Tool") %>%
+    left_join(lr_ci_lb, by=c('Tool', 'Threshold', 'test')) %>%
+    left_join(lr_ci_ub, by=c('Tool', 'Threshold', 'test')) %>%
+    ungroup() %>%
+    # so that labels for clingen criteria are not starting at 0 for fixed intervals
+    mutate(xmin = xmin + 0.05)
+  
+  p = ggplot(plot_data, aes(Threshold, Value, colour = test, fill = test)) +
+    geom_ribbon(aes(ymin = ymin, ymax = ymax), alpha = 0.1, linetype = 0) +
+    facet_wrap(~formatted_name, scales="free_y") +
+    geom_line(size = 0.9) +
+    geom_vline(aes(xintercept = mcc_maximixing_th), linetype="dotted", color = "blue") +
+    geom_hline(aes(yintercept = supporting_plus), linetype="dotted", color = "#D89000") +
+    geom_text(aes(xmin, supporting_plus, label ="Supporting (P)", vjust = "inward", hjust = "inward"), color = "#D89000", size = 2, check_overlap = T) +
+    geom_hline(aes(yintercept = supporting_minus), linetype="dotted", color = "#D89000") +
+    geom_text(aes(xmin, supporting_minus, label ="Supporting (B)", vjust = "outward", hjust = "inward"), color = "#D89000", size = 2, check_overlap = T) +
+    geom_hline(aes(yintercept = moderate_plus), linetype="dotted", color = "#00BF7D") +
+    geom_text(aes(xmin, moderate_plus, label ="Moderate (P)", vjust = "inward", hjust = "inward"), color = "#00BF7D", size = 2, check_overlap = T) +
+    geom_hline(aes(yintercept = strong_plus), linetype="dotted", color = "#9590FF") +
+    geom_text(aes(xmin, strong_plus, label ="Strong (P)", vjust = "inward", hjust = "inward"), color = "#9590FF", size = 2, check_overlap = T) +
+    geom_hline(aes(yintercept = strong_minus), linetype="dotted", color = "#9590FF") +
+    geom_text(aes(xmin, strong_minus, label ="Strong (B)", vjust = "outward", hjust = "inward"), color = "#9590FF", size = 2, check_overlap = T) +
+    geom_hline(aes(yintercept = vstrong_plus), linetype="dotted", color = "#FF62BC") +
+    geom_text(aes(xmin, vstrong_plus, label ="Very Strong (P)", vjust = "inward", hjust = "inward"), color = "#FF62BC", size = 2, check_overlap = T) +
+    geom_hline(aes(yintercept = vstrong_minus), linetype="dotted", color = "#FF62BC") +
+    geom_text(aes(xmin, vstrong_minus, label ="Very Strong (B)", vjust = "inward", hjust = "inward"), color = "#FF62BC", size = 2, check_overlap = T) +
+    scale_color_manual(labels = c(expression(paste(LR^~{"-"})), expression(paste(" ", LR^~{"+"}))), values=c("#603D71", "#A4B962")) +
+    scale_fill_manual(labels = c(expression(paste(LR^~{"-"})), expression(paste(" ", LR^~{"+"}))), values=c("#603D71", "#A4B962"), guide = "none") +
+    guides(colour = guide_legend(title = "Metric")) +
+    scale_y_continuous(trans='log2') + 
+    scale_x_continuous(breaks = seq(0, 1, 0.1), 
+                       labels = setNames(sapply(seq(0,1, 0.1), 
+                                                function(x) str_replace(x, "0.[13579]", "")),
+                                         seq(0,1, 0.1)), 
+                       # this is so that 0 is at the intersection of x axis with y
+                       expand = expansion(mult = c(0, 0))) + 
+    theme_cowplot(font_size = 10) + ylab("Likelihood Ratio")
+  
+  ggsave(file.path(params$plot_path, str_c(subset_label, "-subset"), 
+                   "likelihood-ratios-fixed-intervals.pdf"), p,  device = "pdf", width = 13, units = "in")
+  
+  # When only plotting for splicing tools on the broad subset
+  # will the condition be true, so that the rest of the plots for tools
+  # with no data for this subset are not printed
+  if(!plot_all){ return()}
+  
+  plot_data = ds %>% 
+    d_filter(Tool %in% (th_increment_type %>% d_filter(discrete == FALSE) %>% .[['Tool']])) %>%
+    group_by(Tool) %>% 
+    pivot_longer(c("LR+", "LR-"), names_to = 'test', values_to = 'Value') %>%
+    d_select(Threshold, Value, test) %>%
+    left_join(ds_hlines, by="Tool") %>%
+    left_join(thresholds_vlines, by="Tool") %>%
+    left_join(lr_ci_lb, by=c('Tool', 'Threshold', 'test')) %>%
+    left_join(lr_ci_ub, by=c('Tool', 'Threshold', 'test')) %>%
+    ungroup() %>%
+    # so that labels for clingen criteria are not starting at 0 for variable intervals
+    mutate(xmin = xmin + 0.2)
+  
+  q = ggplot(plot_data, aes(Threshold, Value, colour=test, fill = test)) +
+    geom_ribbon(aes(ymin = ymin, ymax = ymax), alpha = 0.1, linetype = 0) +
+    facet_wrap(~formatted_name, scales="free") +
+    geom_line(size = 0.9) +
+    geom_vline(aes(xintercept = mcc_maximixing_th), linetype="dotted", color = "blue") +
+    geom_hline(aes(yintercept = supporting_plus), linetype="dotted", color = "#D89000") +
+    geom_text(aes(xmin, supporting_plus, label ="Supporting (P)", vjust = "inward", hjust = "inward"), color = "#D89000", size = 3, check_overlap = T) +
+    geom_hline(aes(yintercept = supporting_minus), linetype="dotted", color = "#D89000") +
+    geom_text(aes(xmin, supporting_minus, label ="Supporting (B)", vjust = "inward", hjust = "inward"), color = "#D89000", size = 3, check_overlap = T) +
+    geom_hline(aes(yintercept = moderate_plus), linetype="dotted", color = "#00BF7D") +
+    geom_text(aes(xmin, moderate_plus, label ="Moderate (P)", vjust = "inward", hjust = "inward"), color = "#00BF7D", size = 3, check_overlap = T) +
+    geom_hline(aes(yintercept = strong_plus), linetype="dotted", color = "#9590FF") +
+    geom_text(aes(xmin, strong_plus, label ="Strong (P)", vjust = "inward", hjust = "inward"), color = "#9590FF", size = 3, check_overlap = T) +
+    geom_hline(aes(yintercept = strong_minus), linetype="dotted", color = "#9590FF") +
+    geom_text(aes(xmin, strong_minus, label ="Strong (B)", vjust = "inward", hjust = "inward"), color = "#9590FF", size = 3, check_overlap = T) +
+    geom_hline(aes(yintercept = vstrong_plus), linetype="dotted", color = "#FF62BC") +
+    geom_text(aes(xmin, vstrong_plus, label ="Very Strong (P)", vjust = "inward", hjust = "inward"), color = "#FF62BC", size = 3, check_overlap = T) +
+    geom_hline(aes(yintercept = vstrong_minus), linetype="dotted", color = "#FF62BC") +
+    geom_text(aes(xmin, vstrong_minus, label ="Very Strong (B)", vjust = "inward", hjust = "inward"), color = "#FF62BC", size = 3, check_overlap = T) +
+    scale_color_manual(labels = c(expression(paste(LR^~{"-"})), expression(paste(" ", LR^~{"+"}))), values=c("#603D71", "#A4B962")) +
+    scale_fill_manual(labels = c(expression(paste(LR^~{"-"})), expression(paste(" ", LR^~{"+"}))), values=c("#603D71", "#A4B962"), guide = "none") +
+    guides(colour = guide_legend(title = "Metric")) +
+    scale_y_continuous(trans='log2') + 
+    scale_x_continuous(# this is so that 0 is at the intersection of x axis with y
+                       expand = expansion(mult = c(0, 0))) + 
+    theme_cowplot(font_size = 10) + ylab("Likelihood Ratio")
+  
+  ggsave(file.path(params$plot_path, str_c(subset_label, "-subset"), 
+                   "likelihood-ratios-variable-intervals.pdf"), q,  device = "pdf", width = 9, units = "in")
+  
+  
+  
+  # selected tools
+  plot_data = ds %>% 
+    d_filter(Tool %in% c('BayesDel_addAF_score','CADD_PHRED', 
+                         'Eigen-PC-phred_coding', 'GERP++_RS', 
+                         'REVEL_score', 'SpliceAI_DS', 
+                         'MetaSVM_score', "phyloP100way_vertebrate", 
+                         "phastCons30way_mammalian")) %>%
+    group_by(Tool) %>% 
+    pivot_longer(c("LR+", "LR-"), names_to = 'test', values_to = 'Value') %>%
+    d_select(Threshold, Value, test) %>%
+    left_join(ds_hlines, by="Tool") %>%
+    left_join(thresholds_vlines, by="Tool") %>%
+    left_join(lr_ci_lb, by=c('Tool', 'Threshold', 'test')) %>%
+    left_join(lr_ci_ub, by=c('Tool', 'Threshold', 'test')) %>%
+    ungroup()
+  
+  suggested_thresholds = ds %>% 
+    d_filter(`LR+` >= 2.08 & `LR-` <= 1/2.08) %>%
+    arrange(Tool, Threshold) %>% 
+    group_by(Tool) %>% 
+    d_select(Tool, Threshold) %>%
+    d_filter(row_number() %in% c(1, n())) %>%
+    mutate(suggested_th = str_c(Threshold, collapse = ";")) %>%
+    distinct(Tool, suggested_th) %>%
+    separate(suggested_th, c("suggested_th_lb", "suggested_th_ub"), fill="right", sep=";") %>%
+    mutate(suggested_th_ub = ifelse(is.na(suggested_th_ub), suggested_th_lb, suggested_th_ub)) %>%
+    ungroup() %>%
+    left_join(plot_data %>%
+                group_by(Tool) %>% 
+                d_select(Tool, Value) %>% 
+                summarise(ymin = min(Value), ymax = max(Value)), by = "Tool") %>%
+    mutate_at(vars(suggested_th_lb, suggested_th_ub, ymax), as.double) %>%
+    right_join(plot_data %>% d_select(Tool, formatted_name) %>% distinct() %>% d_filter(formatted_name != 'SpliceAI'), by="Tool") %>%
+    mutate(vline = ifelse(suggested_th_ub == suggested_th_lb, suggested_th_ub, NA))
+  
+  
+  r = ggplot(plot_data, aes(Threshold, Value, colour=test, fill = test)) +
+    geom_ribbon(aes(ymin = ymin, ymax = ymax), alpha = 0.1, linetype = 0) +
+    facet_wrap(~formatted_name, scales="free") +
+    geom_line(size = 0.9) +
+    geom_vline(aes(xintercept = mcc_maximixing_th), linetype="dotted", color = "blue") +
+    geom_hline(aes(yintercept = supporting_plus), linetype="dotted", color = "#D89000") +
+    geom_text(aes(xmin, supporting_plus, label ="Supporting (P)", vjust = "inward", hjust = "inward"), color = "#D89000", size = 3, check_overlap = T) +
+    geom_hline(aes(yintercept = supporting_minus), linetype="dotted", color = "#D89000") +
+    geom_text(aes(xmin, supporting_minus, label ="Supporting (B)", vjust = "inward", hjust = "inward"), color = "#D89000", size = 3, check_overlap = T) +
+    geom_hline(aes(yintercept = moderate_plus), linetype="dotted", color = "#00BF7D") +
+    geom_text(aes(xmin, moderate_plus, label ="Moderate (P)", vjust = "inward", hjust = "inward"), color = "#00BF7D", size = 3, check_overlap = T) +
+    geom_hline(aes(yintercept = strong_plus), linetype="dotted", color = "#9590FF") +
+    geom_text(aes(xmin, strong_plus, label ="Strong (P)", vjust = "inward", hjust = "inward"), color = "#9590FF", size = 3, check_overlap = T) +
+    geom_hline(aes(yintercept = strong_minus), linetype="dotted", color = "#9590FF") +
+    geom_text(aes(xmin, strong_minus, label ="Strong (B)", vjust = "inward", hjust = "inward"), color = "#9590FF", size = 3, check_overlap = T) +
+    geom_hline(aes(yintercept = vstrong_plus), linetype="dotted", color = "#FF62BC") +
+    geom_text(aes(xmin, vstrong_plus, label ="Very Strong (P)", vjust = "inward", hjust = "inward"), color = "#FF62BC", size = 3, check_overlap = T) +
+    geom_hline(aes(yintercept = vstrong_minus), linetype="dotted", color = "#FF62BC") +
+    geom_text(aes(xmin, vstrong_minus, label ="Very Strong (B)", vjust = "inward", hjust = "inward"), color = "#FF62BC", size = 3, check_overlap = T) +
+    scale_color_manual(labels = c("LR-", "LR+"), values=c("#603D71", "#A4B962"), guide = "none") +
+    scale_fill_manual(labels = c("LR-", "LR+"), values=c("#603D71", "#A4B962"), guide = "none") +
+    guides(colour = guide_legend(title = "Metric")) +
+    scale_y_continuous(trans='log2') + 
+    theme_cowplot(font_size = 10) + ylab("Likelihood Ratio")
+  
+  ggsave(file.path(params$plot_path, str_c(subset_label, "-subset"), 
+                   "likelihood-ratios-selected-tools.pdf"), r,  device = "pdf", width = 9, units = "in")
+  return(r)
+}
+
+# the file tools_pathogenis_performance.csv contains the tools vs thresholds
+# in vep_splicing_tools_performance-1.csv but on the whole dataset and not the
+# splice SNVs so it is necessary to read the results for the splice SNVs and
+# remove thos tools from params$2.1
+ds_splicing = map(c(params$f2.2), read_xlsx, sheet="Varied prediction thresholds") %>%
+    Reduce(function(df1, df2) bind_rows(as_tibble(df1), as_tibble(df2)), .)
+
+ds_all = map(c(params$f2.1), read_xlsx, sheet="Varied prediction threshold") %>%
+  Reduce(function(df1, df2) bind_rows(as_tibble(df1), as_tibble(df2)), .) %>%
+  d_filter(!Tool %in% (ds_splicing %>% distinct(Tool) %>% .[['Tool']])) %>%
+  bind_rows(ds_splicing)
+
+# this is the plot that is gonna be used in the panel  
+lr_plot = wrap_plotting(ds_all, 'all', c(params$f3.1, params$f3.2))
+
+ds_missense = read_xlsx(params$f2.3, sheet = "Missense") %>%
+  d_filter(!Tool %in% (ds_splicing %>% distinct(Tool) %>% .[['Tool']])) 
+wrap_plotting(ds_missense, 'missense', c(params$f3.1, params$f3.2))
+
+ds_non_missense =  read_xlsx(params$f2.3, sheet = "Non Missense") %>%
+  d_filter(!Tool %in% (ds_splicing %>% distinct(Tool) %>% .[['Tool']]))
+wrap_plotting(ds_non_missense, 'non_missense', c(params$f3.1, params$f3.2))
+
+ds_hba =  read_xlsx(params$f2.3, sheet = "HBA1") %>%
+  d_filter(!Tool %in% (ds_splicing %>% distinct(Tool) %>% .[['Tool']])) 
+wrap_plotting(ds_hba, 'hba1', c(params$f3.1, params$f3.2))
+
+ds_hba =  read_xlsx(params$f2.3, sheet = "HBA2") %>%
+  d_filter(!Tool %in% (ds_splicing %>% distinct(Tool) %>% .[['Tool']])) 
+wrap_plotting(ds_hba, 'hba2', c(params$f3.1, params$f3.2))
+
+ds_hbb =  read_xlsx(params$f2.3, sheet = "HBB") %>%
+  d_filter(!Tool %in% (ds_splicing %>% distinct(Tool) %>% .[['Tool']]))
+wrap_plotting(ds_hbb, 'hbb', c(params$f3.1, params$f3.2))
+```
+
+# LR plot for Maxentscan
+
+```{r plot-maxentscan, echo=FALSE, warning=FALSE, message=FALSE}
+ds_maxentscan = read_xlsx(params$f2.2, sheet="MaxentScan-Varied prediction th")
+
+maxentscan_vlines = read_csv(params$f3.3) %>%
+  d_select(-MCC) %>%
+  mutate(formatted_name = str_replace(Tool_1, "_diff", ''))
+
+
+# in the paper the very strong threshold is 350, I assume it's a typo but confirm
+evidence_strength = tibble(strength =  c("Very Strong", "Strong", "Moderate", "Supporting"),
+                           value = c(350, 18.7, 4.3, 2.08))
+
+ds_maxentscan_hlines = tibble(Tool_1 = (ds_maxentscan %>% .[['Tool_1']] %>% as.factor() %>% levels()), 
+                   upper_bound = ds_maxentscan  %>% summarise(tmp = max(`LR+`)) %>% .[['tmp']], 
+                   lower_bound = ds_maxentscan  %>% summarise(tmp = min(`LR-`)) %>% .[['tmp']], 
+                   xmin = ds_maxentscan %>%  summarise(tmp = min(Threshold_1)) %>% .[['tmp']], 
+                   ) %>%
+  mutate( supporting_plus = case_when(upper_bound >= 2.08 | upper_bound >= (2.08 - 5)  ~ 2.08), 
+          moderate_plus = case_when(upper_bound >= 4.3 | upper_bound >= (4.3 - 5)  ~ 4.3), 
+          strong_plus = case_when(upper_bound >= 18.7 | upper_bound >= (18.7 - 5)  ~ 18.7), 
+          vstrong_plus = case_when(upper_bound >= 350 | upper_bound >= (350 - 5)  ~ 350), 
+          supporting_minus = case_when(lower_bound <= (1/2.08) | lower_bound <= ((1/2.08) + 0.1)  ~ 1/2.08), 
+          # removing moderate benign as that doesn't exist
+          #moderate_minus = case_when(lower_bound <= (1/4.3) | lower_bound <= ((1/4.3) + 0.1)  ~ 1/4.3), 
+          strong_minus = case_when(lower_bound <= (1/18.7) | lower_bound <= ((1/18.7) + 0.05)  ~ 1/18.7), 
+          vstrong_minus = case_when(lower_bound <= (1/350) | lower_bound <= ((1/350) + 0.005)  ~ 1/350), 
+         )
+
+lr_ci_lb = ds_maxentscan %>%
+  pivot_longer(c(`LR+_CI_lower`, `LR-_CI_lower`), names_to = "tmp", values_to = "ymin") %>% 
+  separate(tmp, c("test", "tmp"), sep="_", extra="drop") %>%
+  d_select(Tool_1, Threshold_1, Threshold_2, ymin, test)
+
+lr_ci_ub = ds_maxentscan %>%
+  pivot_longer(c(`LR+_CI_upper`, `LR-_CI_upper`), names_to = "tmp", values_to = "ymax") %>% 
+  separate(tmp, c("test", "tmp"), sep="_", extra="drop") %>%
+  d_select(Tool_1, Threshold_1, Threshold_2, ymax, test)
+
+plot_data = ds_maxentscan %>% 
+  pivot_longer(c("LR+", "LR-"), names_to = 'test', values_to = 'Value') %>%
+  d_select(Tool_1, Threshold_1, Threshold_2, Value, test) %>%
+  left_join(ds_maxentscan_hlines, by="Tool_1") %>%
+  left_join(maxentscan_vlines, by= c("Tool_1", "Threshold_1", "Threshold_2")) %>%
+  left_join(lr_ci_lb, by=c('Tool_1', 'Threshold_1', 'Threshold_2','test')) %>%
+  left_join(lr_ci_ub, by=c('Tool_1', 'Threshold_1', 'Threshold_2', 'test')) %>%
+  ungroup() %>%
+  # so that labels for clingen criteria are not starting at 0 for fixed intervals
+  mutate(xmin = xmin + 0.05)
+
+p = ggplot(plot_data, aes(Threshold_1, Value, colour = test, fill = test)) +
+  geom_ribbon(aes(ymin = ymin, ymax = ymax), alpha = 0.1, linetype = 0) +
+  facet_wrap(~Threshold_2, scales="free_y") +
+  geom_line(size = 0.9) +
+  #geom_vline(aes(xintercept = mcc_maximixing_th), linetype="dotted", color = "blue") +
+  geom_hline(aes(yintercept = supporting_plus), linetype="dotted", color = "#D89000") +
+  geom_text(aes(xmin, supporting_plus, label ="Supporting (P)", vjust = "inward", hjust = "inward"), color = "#D89000", size = 2, check_overlap = T) +
+  geom_hline(aes(yintercept = supporting_minus), linetype="dotted", color = "#D89000") +
+  geom_text(aes(xmin, supporting_minus, label ="Supporting (B)", vjust = "outward", hjust = "inward"), color = "#D89000", size = 2, check_overlap = T) +
+  geom_hline(aes(yintercept = moderate_plus), linetype="dotted", color = "#00BF7D") +
+  geom_text(aes(xmin, moderate_plus, label ="Moderate (P)", vjust = "inward", hjust = "inward"), color = "#00BF7D", size = 2, check_overlap = T) +
+  geom_hline(aes(yintercept = strong_plus), linetype="dotted", color = "#9590FF") +
+  geom_text(aes(xmin, strong_plus, label ="Strong (P)", vjust = "inward", hjust = "inward"), color = "#9590FF", size = 2, check_overlap = T) +
+  geom_hline(aes(yintercept = strong_minus), linetype="dotted", color = "#9590FF") +
+  geom_text(aes(xmin, strong_minus, label ="Strong (B)", vjust = "outward", hjust = "inward"), color = "#9590FF", size = 2, check_overlap = T) +
+  geom_hline(aes(yintercept = vstrong_plus), linetype="dotted", color = "#FF62BC") +
+  geom_text(aes(xmin, vstrong_plus, label ="Very Strong (P)", vjust = "inward", hjust = "inward"), color = "#FF62BC", size = 2, check_overlap = T) +
+  geom_hline(aes(yintercept = vstrong_minus), linetype="dotted", color = "#FF62BC") +
+  geom_text(aes(xmin, vstrong_minus, label ="Very Strong (B)", vjust = "inward", hjust = "inward"), color = "#FF62BC", size = 2, check_overlap = T) +
+  scale_color_manual(labels = c(expression(paste(LR^~{"-"})), expression(paste(" ", LR^~{"+"}))), values=c("#603D71", "#A4B962")) +
+  scale_fill_manual(labels = c(expression(paste(LR^~{"-"})), expression(paste(" ", LR^~{"+"}))), values=c("#603D71", "#A4B962"), guide = "none") +
+  guides(colour = guide_legend(title = "Metric")) +
+  scale_y_continuous(trans='log2') + 
+  scale_x_continuous(# this is so that 0 is at the intersection of x axis with y
+                     expand = expansion(mult = c(0, 0))) + 
+  theme_cowplot(font_size = 10) 
+
+ggsave(file.path(params$plot_path, "all-subset",  "likelihood-maxentscan.pdf"), p,  device = "pdf", width = 13, units = "in")
+```
+
+# Figure 3B and 3C
+
+```{r concordance-4-upset, echo=FALSE, warning=FALSE, message=FALSE}
+
+concordance_rate = read_csv(params$f6.2)
+
+concordance_p = concordance_rate %>%
+  mutate_if(is.numeric, ~round(., 1)) %>%
+  d_filter(class == "Pathogenic") %>%
+  arrange(desc(concordance)) %>%
+  mutate(highlight = ifelse(row_number() < 4, TRUE, FALSE)) %>%
+  slice(1:10) %>%
+  separate_rows(tools, sep=", ") %>%
+  mutate(tools = recode(tools, 
+                        !!!setNames(tool_names_formatted$formatted_name, tool_names_formatted$Tool))) %>% 
+  group_by(name) %>% 
+  mutate(tools_str = str_c(tools, collapse=","),
+         tools = list(tools)) %>%
+  distinct() %>%
+  uncount(correct_call) 
+
+write.xlsx(concordance_p %>% d_select(-tools) %>% as.data.frame(), 
+           file.path(params$plot_path, "plot-source-files",
+                     "Figure-3-data.xlsx"), 
+           sheetName = str_c("Panel B - Source data"),
+           row.names = F, append = F)
+
+concordance_b = concordance_rate %>%
+  mutate_if(is.numeric, ~round(., 1)) %>%
+  d_filter(class == "Benign") %>%
+  arrange(desc(concordance)) %>%
+  mutate(highlight = ifelse(row_number() < 4, TRUE, FALSE)) %>%
+  slice(1:10) %>%
+  separate_rows(tools, sep=", ") %>%
+  mutate(tools = recode(tools, 
+                        !!!setNames(tool_names_formatted$formatted_name, tool_names_formatted$Tool))) %>% 
+  group_by(name) %>% 
+  mutate(tools_str = str_c(tools, collapse=","),
+         tools = list(tools)) %>%
+  distinct() %>%
+  uncount(correct_call)
+
+write.xlsx(concordance_b %>% d_select(-tools) %>% as.data.frame(), 
+           file.path(params$plot_path, "plot-source-files",
+                     "Figure-3-data.xlsx"), 
+           sheetName = str_c("Panel C - Source data"),
+           row.names = F, append = F)
+   
+p = concordance_p %>%
+  ggplot(aes(x=tools)) +
+  geom_bar(aes(fill = highlight)) +
+  scale_fill_manual(values = c(`TRUE` = "#1F78B4", `FALSE` = "grey50")) +
+  geom_text(stat = 'count',  aes(label=str_c(concordance, "%")), 
+            hjust = 1.1, 
+            size = 3,
+            angle = 90, 
+            color = "white") +
+  xlab("") + ylab("P/LP calls (n)") +
+  scale_x_mergelist(sep = ",") +
+  axis_combmatrix(sep = ",") +
+  theme_cowplot(font_size = 10) + 
+  theme(legend.position="none") +
+  theme_combmatrix(combmatrix.label.text = element_text(size = 8), 
+                   combmatrix.label.make_space = T)
+
+  # Use this piece of code to customise the combination matrix 
+  # if using R3.6.1 
+  #axis_combmatrix(sep = ",", 
+  #                override_plotting_function = function(df){
+  #                  df = df %>%
+  #                    mutate(highlight = case_when(
+  #                      ! observed ~ "not observed",
+  #                      labels == "BayesDel,EIGEN-PC" ~ "Top 3",
+  #                      labels == "EIGEN-PC,REVEL" ~ "Top 3",
+  #                      labels == "Meta-SVM,REVEL" ~ "Top 3",
+  #                      observed ~ "Else"
+  #                      )) %>% arrange(index)
+  #                  print(df)
+  #                  ggplot(df, aes(x = at, y = single_label)) +
+  #                    geom_rect(aes(fill = index %% 2 == 0), 
+  #                              ymin = df$index-0.5, 
+  #                              ymax = df$index+0.5, 
+  #                              xmin = 0, xmax = 1) +
+  #                    geom_point(aes(color = highlight), size = 3) +
+  #                    geom_line(data = function(dat) dat[dat$observed, ,drop=FALSE],
+  #                              aes(group = labels, color = highlight), 
+  #                              size= 1.2) +
+  #                    ylab("") + xlab("") +
+  #                    scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  #                    scale_fill_manual(values= c(`TRUE` = "white", `FALSE` = "#F7F7F7")) +
+  #                    scale_color_manual(values= c("Top 3" = "#1F78B4",
+  #                                                 "Else" = "grey50", 
+  #                                                 "not observed" = "lightgrey")) +
+  #                    guides(color = "none", fill="none") +
+  #                    theme(panel.background = element_blank(),
+  #                          axis.text.x = element_blank(),
+  #                          axis.ticks.y = element_blank(),
+  #                          axis.ticks.length = unit(0, "pt"),
+  #                          axis.title.y = element_blank(),
+  #                          axis.title.x = element_blank(),
+  #                          axis.line = element_blank(),
+  #                          panel.border = element_blank()
+  #                          )
+  #                  }) 
+   
+b = concordance_b %>%
+  ggplot(aes(x=tools)) +
+  geom_bar(aes(fill = highlight)) +
+  scale_fill_manual(values = c(`TRUE` = "#1F78B4", `FALSE` = "grey50")) +
+  geom_text(stat = 'count',  aes(label=str_c(concordance, "%")), 
+            hjust = 1.1, 
+            size = 3,
+            angle = 90, 
+            color = "white") +
+  xlab("") + ylab("B/LB calls (n)") +
+  scale_x_mergelist(sep = ",") +
+  axis_combmatrix(sep = ",") +
+  theme_cowplot(font_size = 10) + 
+  theme(legend.position="none") +
+  theme_combmatrix(combmatrix.label.text = element_text(size = 8), 
+                   combmatrix.label.make_space = T) 
+  
+ # axis_combmatrix(sep = ",", 
+ #                 override_plotting_function = function(df){
+ #                   df = df %>%
+ #                     mutate(highlight = case_when(
+ #                       ! observed ~ "not observed",
+ #                       labels == "EIGEN-PC,REVEL" ~ "Top 3",
+ #                       labels == "EIGEN-PC,Meta-SVM" ~ "Top 3",
+ #                       labels == "Meta-SVM,REVEL" ~ "Top 3",
+ #                       observed ~ "Else"
+ #                       ))
+ #                   print(df)
+ #                   ggplot(df, aes(x = at, y = single_label)) +
+ #                     geom_rect(aes(fill = index %% 2 == 0), 
+ #                               ymin = df$index-0.5, 
+ #                               ymax = df$index+0.5, 
+ #                               xmin = 0, xmax = 1) +
+ #                     geom_point(aes(color = highlight), size = 3) +
+ #                     geom_line(data = function(dat) dat[dat$observed, ,drop=FALSE],
+ #                               aes(group = labels, color = highlight), 
+ #                               size= 1.2) +
+ #                     ylab("") + xlab("") +
+ #                     scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+ #                     scale_fill_manual(values= c(`TRUE` = "white", `FALSE` = "#F7F7F7")) +
+ #                     scale_color_manual(values= c("Top 3" = "#1F78B4",
+ #                                                  "Else" = "grey50", 
+ #                                                  "not observed" = "lightgrey")) +
+ #                     guides(color = "none", fill="none") +
+ #                     theme(panel.background = element_blank(),
+ #                           axis.text.x = element_blank(),
+ #                           axis.ticks.y = element_blank(),
+ #                           axis.ticks.length = unit(0, "pt"),
+ #                           axis.title.y = element_blank(),
+ #                           axis.title.x = element_blank(),
+ #                           axis.line = element_blank(),
+ #                           panel.border = element_blank()
+ #                           )
+ #                   }) 
+```
+
+# Figure-3
+
+```{r performance-figure, echo=FALSE, warning=FALSE, message=FALSE}
+p_comb = lr_plot + p + b +
+  plot_layout(design ="AAA\nAAA\nAAA\nB#C\n") +
+  plot_annotation(tag_levels = "A")
+ggsave(file.path(params$plot_path, "Figure-3.pdf"), 
+       p_comb,  
+       width = 210,
+       height = 210,
+       units = "mm",
+       device = cairo_pdf,
+       dpi="retina")
+
+```
+
+# Supplementary Figure-1
+
+```{r compare-initial-annotation}
+# source data is the input file to the whole analysis
+x = read_csv(params$f1)
+
+plot_data = x %>% 
+  mutate(flag = ifelse(Initial_observed_pathogenicity != Observed_pathogenicity, TRUE, FALSE)) %>%
+  d_rename(initial = Initial_observed_pathogenicity,  final = Observed_pathogenicity) %>%
+  d_select(ithaID, initial, final) %>%
+  group_by(initial, final) %>%
+  summarise(cnt = n()) 
+
+p = ggplot(plot_data, aes(x = initial, y = cnt, fill = final)) +
+  geom_bar(stat = "identity", position = "stack") +
+  geom_text(aes(y= cnt, label = cnt),  position = position_stack(vjust=0.5), size=3) +
+  labs(x = "Classification by curators", fill = "Classification by experts", y="") +
+  theme_cowplot() +
+  scale_fill_manual(values = setNames(c("#4ca6ff", "#ff4cff", "#35b235"), c("VUS", "P/LP", "B/LB"))) +
+  theme(legend.position="bottom")
+
+ggsave(file.path(params$plot_path, "Supplementary-Figure-1.pdf"), 
+       p,  
+       width = 210,
+       height = 210,
+       units = "mm",
+       device = cairo_pdf,
+       dpi="retina")
+```
+
+# Supplementary Figure-2
+
+```{r construct-tracks, echo=FALSE, warning=FALSE, message=FALSE, include=FALSE, eval = T}
+box::use(Gviz[...], 
+         GenomicRanges[makeGRangesFromDataFrame, tile, GRanges, countOverlaps, GRangesList],
+         IRanges[...],
+         GenomicFeatures[...], 
+         forcats[...])
+
+if(file.exists(file.path(params$annotations_path, "e75-txdb-object-hb-txs-only.sqlite"))){
+  txs = AnnotationDbi::loadDb(file.path(params$annotations_path, "e75-txdb-object-hb-txs-only.sqlite"))
+} else {
+  # the commented code may not work for R4.2.1 and GenomicFeatures::makeTxDbFromBiomart
+  # will be deprecated soon so use GenomicFeatures::makeTxDbFromEnsembl instead
+  #txs = GenomicFeatures::makeTxDbFromBiomart(biomart="ENSEMBL_MART_ENSEMBL",
+  #                    dataset="hsapiens_gene_ensembl",
+  #                    transcript_ids=c("ENST00000335295", "ENST00000320868", "ENST00000251595"),
+  #                    circ_seqs=NULL,
+  #                    filter=NULL,
+  #                    id_prefix="ensembl_",
+  #                    host="https://feb2014.archive.ensembl.org/",
+  #                    #port=80,
+  #                    taxonomyId=NA,
+  #                    miRBaseBuild=NA)
+  
+  txs = GenomicFeatures::makeTxDbFromEnsembl(organism="Homo sapiens",
+                      # Feb 2014, GRCh37                       
+                      release=75,
+                      circ_seqs=NULL,
+                      server="ensembldb.ensembl.org",
+                      username="anonymous", password=NULL,
+                      # using specific port as per the
+                      # https://asia.ensembl.org/info/data/mysql.html
+                      port=3306,
+                      tx_attrib="gencode_basic")
+
+  AnnotationDbi::saveDb(txs, file=file.path(params$annotations_path, "e75-txdb-object.sqlite"))
+  
+  txdb_dump = as.list(txs)
+  txdb_dump$transcripts = txdb_dump$transcripts %>%
+    as_tibble() %>% 
+    d_filter(tx_name %in% c("ENST00000335295", "ENST00000320868", "ENST00000251595")) %>%
+    as.data.frame()
+  
+  txdb_dump$splicings = txdb_dump$splicings %>%
+    as_tibble() %>% 
+    d_filter(tx_id %in% (txdb_dump$transcripts %>% as_tibble() %>% .[['tx_id']])) %>%
+    as.data.frame()
+  
+  txdb_dump$genes = txdb_dump$genes %>%
+    as_tibble() %>% 
+    d_filter(tx_id %in% (txdb_dump$transcripts %>% as_tibble() %>% .[['tx_id']])) %>%
+    as.data.frame()
+  
+  txdb_dump$chrominfo = txdb_dump$chrominfo %>%
+    as_tibble() %>% 
+    d_filter(chrom %in% (txdb_dump$transcripts %>% as_tibble() %>% .[['tx_chrom']])) %>%
+    as.data.frame()
+  txs_n = do.call(makeTxDb, txdb_dump)
+  AnnotationDbi::saveDb(txs_n, file=file.path(params$annotations_path, "e75-txdb-object-hb-txs-only.sqlite"))
+}
+
+exons = exonsBy(txs, "tx", use.names=T)
+exon_tiles = unlist(GRangesList(lapply(exons, function(x){unlist(tile(x, width=3))})))
+
+introns = intronsByTranscript(txs, use.names=T)
+# if intron size is not divided by 5 exactly length(x) %%5 != 0
+# then the tile function starts with the smaller bin and then
+# continues with bins of size 5
+intron_tiles = unlist(GRangesList(lapply(introns, function(x){unlist(tile(x, width=5))})))
+
+tmp = unlist(GRangesList(
+  lapply(exons, 
+         function(x){x[(strand(x) == "+" & x$exon_rank == 3) | 
+                         (strand(x) == "-" & x$exon_rank==1)]
+           })))
+down_bounds = GRanges(seqnames= seqnames(tmp), 
+                 IRanges(start = end(tmp) + 1,
+                         end = end(tmp) + 1 + 250),
+                 strand = strand(tmp))
+
+tmp = unlist(GRangesList(
+  lapply(exons, 
+         function(x){x[(strand(x) == "+" & x$exon_rank == 1) | 
+                         (strand(x) == "-" & x$exon_rank==3)]
+           })))
+up_bounds = GRanges(seqnames= seqnames(tmp), 
+                 IRanges(start = start(tmp) - 1 -100,
+                         end = start(tmp) - 1),
+                 strand = strand(tmp)) 
+
+bounds_tiles = unlist(GRangesList(lapply(GRangesList(down_bounds, up_bounds),
+                                                function(x){unlist(tile(x, width=5))})))
+bins = unlist(GRangesList(exon_tiles, intron_tiles, bounds_tiles))
+
+gr = ds %>%
+  d_select(Chr, StartPos, EndPos) %>% 
+  d_rename(chr = Chr, start = StartPos, end = EndPos) %>% 
+  makeGRangesFromDataFrame()
+
+values(gr) = ds %>% d_select(pathogenicity) 
+gr$score = tibble(score = rep(1, length(gr)))
+
+gr_vus = gr[values(gr)$pathogenicity == 'VUS', ]
+gr_plp = gr[values(gr)$pathogenicity == 'P/LP', ]
+gr_blb = gr[values(gr)$pathogenicity == 'B/LB', ]
+
+#https://support.bioconductor.org/p/100222/
+bins$VUS = countOverlaps(bins, gr_vus)
+bins$`P/LP` = countOverlaps(bins, gr_plp)
+bins$`B/LB` = countOverlaps(bins, gr_blb)
+
+# https://support.bioconductor.org/p/52104/
+options(ucscChromosomeNames=FALSE)
+
+dtrack11_freq_vus = DataTrack(bins[seqnames(bins)==11, 1], name = "VUS", type="S",
+                        col = c("#4ca6ff"),
+                        yTicksAt=seq(0, 10, by=2), ylim= c(0,10), cex.axis = 0.35)
+dtrack11_freq_p = DataTrack(bins[seqnames(bins)==11, 2], name = "P/LP", type="S",
+                        col = c("#ff4cff"),
+                        yTicksAt=seq(0, 10, by=2), ylim= c(0,10), cex.axis = 0.35)
+dtrack11_freq_b = DataTrack(bins[seqnames(bins)==11, 3], name = "B/LB", type="S",
+                        col = c("#35b235"),
+                        yTicksAt=seq(0, 10, by=2), ylim= c(0,10), cex.axis = 0.35)
+
+dtrack16_freq_vus = DataTrack(bins[seqnames(bins)==16, 1], name = "VUS", type="S",
+                        col = c("#4ca6ff"),
+                        yTicksAt=0:5, ylim= c(0,5), cex.axis = 0.35)
+dtrack16_freq_p = DataTrack(bins[seqnames(bins)==16, 2], name = "P/LP", type="S",
+                        col = c("#ff4cff"),
+                        yTicksAt=0:5, ylim= c(0,5), cex.axis = 0.35)
+dtrack16_freq_b = DataTrack(bins[seqnames(bins)==16, 3], name = "B/LB", type="S",
+                        col = c("#35b235"),
+                        yTicksAt=0:5, ylim= c(0,5), cex.axis = 0.35)
+
+
+genome_track_11 = GenomeAxisTrack(add35=T, col = "black", lwd=1,
+                               fontcolor="black", showTitle=T, 
+                               name = "Chr 11", rotation.title=0)
+genome_track_16 = GenomeAxisTrack(add35=T, col = "black", lwd=1,
+                               fontcolor="black", showTitle=T, 
+                               name = "Chr 16", rotation.title=0)
+
+
+grtrack = GeneRegionTrack(txs, genome = "hg19",
+                          chromosome = as.character(unique(seqnames(gr))),
+                          name = "", fill = "salmon", col="transparent", 
+                          transcriptAnnotation = "symbol",
+                          col.line = "black", alpha = 0.9, 
+                          geneSymbol = F, showId =T,  
+                          fontface.group=1, fontcolor.group="salmon", 
+                          background.title = "white", size =1, fontsize=7)
+
+map2ensembl_id = tibble(
+  ensembl = c("ENST00000335295", "ENST00000320868", "ENST00000251595"), 
+  hgnc = c("HBB", "HBA1", "HBA2"), 
+  tx_ids = c("79899", "79901", "61400")) 
+symbol(grtrack) = map2ensembl_id[match(symbol(grtrack), map2ensembl_id$ensembl), 'hgnc'][[1]]
+
+pdf(file.path(params$plot_path, "Supplementary-Figure-2.pdf"))
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(3, 1, heights=c(0.33,0.33,0.33))))
+pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
+chromosome(grtrack) = "16"
+plotTracks(list(genome_track_16, grtrack,
+                dtrack16_freq_vus, dtrack16_freq_p, dtrack16_freq_b), 
+           from = 222746, to = 223809,
+           rotation.title=90, background.title = "white",
+           col.title="black", fontface.title=1, col.axis= "black",
+           add=T)
+popViewport(1)
+pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 2))
+plotTracks(list(genome_track_16, grtrack,
+                dtrack16_freq_vus, dtrack16_freq_p, dtrack16_freq_b), 
+           from = 226579, to = 227721,
+           rotation.title=90, background.title = "white",
+           col.title="black", fontface.title=1, col.axis= "black",
+           add=T)
+chromosome(grtrack) = "11"
+popViewport(1)
+pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 3))
+plotTracks(list(genome_track_11, grtrack, dtrack11_freq_vus, dtrack11_freq_p, dtrack11_freq_b),
+           #from = 5246594, to = 5248551,
+           rotation.title=90, background.title = "white",
+           col.title="black", fontface.title=1, col.axis= "black",
+           add=T)
+dev.off()
+```
+
+# Supplementary Figure-3
+
+```{r heatmap, echo=FALSE, warning=FALSE, message=FALSE}
+box::use(ComplexHeatmap[...])
+
+# 1 in the file means observed pathogenicity is pathogenic and 0 is benign
+# mapping the data to 1 for correlation of actual with observed and -1 for
+# anticorrelation of actual and observed
+pathogenic_df = read_csv(params$f4) %>%
+  mutate(across(-c('ithaID', 'HGVS'), ~ifelse(.x == 0, -1, .x)),
+         across(-c('ithaID', 'HGVS'), ~replace_na(.x, 0)))
+benign_df = read_csv(params$f5) %>%
+  mutate(across(-c('ithaID', 'HGVS'), ~ifelse(.x == 1, -1, .x)),
+         across(-c('ithaID', 'HGVS'), ~ifelse(.x == 0, 1, .x)),
+         across(-c('ithaID', 'HGVS'), ~replace_na(.x, 0)))
+concordance_df = bind_rows(benign_df, pathogenic_df) 
+
+concordance_df_expanded = concordance_df %>%
+  pivot_longer(-c(ithaID, HGVS), names_to="tool", values_to = "value") %>%
+  d_filter(tool != "Eigen-phred_coding") %>%
+  mutate(tool = recode(tool, !!!setNames(tool_names_formatted$formatted_name, tool_names_formatted$Tool))) %>% 
+  pivot_wider(names_from = "tool", values_from = "value") %>%
+  left_join(ds %>% d_select(effect, pathogenicity, ithaID, HGVS), by=c("ithaID", "HGVS")) %>% 
+  left_join(ithaid_f_gene %>% d_select(hugo_name, ithaID) %>%
+              d_rename(Gene = hugo_name), by="ithaID") %>%
+  group_by(ithaID) %>% 
+  mutate(uniq_id = str_c(ithaID, cur_group_rows(), sep="_")) %>%
+  ungroup() %>%
+  distinct(uniq_id, .keep_all = T) %>%
+  mutate(across(where(is.double) & !c(ithaID), ~ifelse(.x == 0, NA, .x))) %>% 
+  d_select(! matches("SpliceAI", "ada_score", "rf_score")) %>%
+  d_filter(if_any(where(is.double) & !c(ithaID), ~!is.na(.)))
+
+write.xlsx(concordance_df_expanded %>% as.data.frame(), 
+           file.path(params$plot_path, "plot-source-files",
+                     "Supplementary-Figure-3-data.xlsx"), 
+           sheetName = str_c("Source data"),
+           row.names = F, append = F)
+
+concordance_matr = concordance_df_expanded %>%
+  d_select(-c(ithaID, effect, pathogenicity, uniq_id, Gene, HGVS)) %>% as.matrix()
+rownames(concordance_matr) = concordance_df_expanded %>% .[['uniq_id']]
+
+row_annotation = concordance_df_expanded %>%
+  d_select(effect, pathogenicity, Gene) %>%
+  d_rename(Effect = effect, Pathogenicity = pathogenicity) %>%
+  as.data.frame()
+rownames(row_annotation) = concordance_df_expanded %>% .[['uniq_id']]
+
+anno_colors = list(Effect = setNames(paper_colors, 
+                                     sort(unique(row_annotation$Effect), decreasing=F)), 
+                    Gene = plot_colors,
+                    Pathogenicity = setNames(c("#ff4cff","#4ca6ff"), 
+                                             sort(unique(row_annotation$Pathogenicity), decreasing=T)))
+row_annotation = HeatmapAnnotation(df = row_annotation, which = "row", 
+                                   col = anno_colors, 
+                                   annotation_legend_param = list(title_gp = grid::gpar(fontface = "plain", fontsize = 9)),
+                                   annotation_name_gp = grid::gpar(fontsize = 7), 
+                                   annotation_name_rot = 45)
+
+
+p = Heatmap(concordance_matr, show_row_dend = F, na_col="#cfcfcf", show_row_names = F, 
+        name=" ", column_names_rot = 45, col = divergent_colors, 
+        cluster_rows = T, clustering_distance_rows = "euclidean", clustering_method_rows = "complete",
+        column_names_gp = grid::gpar(fontsize = 6),
+        left_annotation = row_annotation, 
+        height = unit(9, "cm"), width = unit(7, "cm"), 
+        heatmap_legend_param = list(by_row=T, color_bar="discrete", at = c(NA, -1,1),
+                                    labels = c( "N/A", "Discordant", "Concordant"),
+                                    title_gp = grid::gpar(fontface = "plain", fontsize = 9) 
+                                    ),
+        ) 
+
+
+pdf(file.path(params$plot_path, "Supplementary-Figure-3.pdf")) 
+draw(p)
+dev.off()
+```
+
+# Supplementary Figure-4
+
+```{r heatmap-separate-th, echo=FALSE, warning=FALSE, message=FALSE}
+box::use(ComplexHeatmap[...])
+
+# this is a table with -1,0,1 values for whether the prediction call 
+# (using separate thresholds for pathogenic and benign) matches the expert
+# annotation
+concordance_trichotomised = read_csv(params$f6.1)
+
+concordance_df_tricho = concordance_trichotomised %>%
+  pivot_longer(-c(ithaID, HGVS), names_to="tool", values_to = "value") %>%
+  d_filter(tool != "Eigen-phred_coding") %>%
+  mutate(tool = recode(tool, !!!setNames(tool_names_formatted$formatted_name, tool_names_formatted$Tool))) %>% 
+  pivot_wider(names_from = "tool", values_from = "value") %>%
+  left_join(ds %>% d_select(effect, pathogenicity, ithaID, HGVS), by=c("ithaID", "HGVS")) %>% 
+  left_join(ithaid_f_gene %>% d_select(hugo_name, ithaID) %>% 
+              d_rename(Gene = hugo_name), by="ithaID") %>%
+  group_by(ithaID) %>% 
+  mutate(uniq_id = str_c(ithaID, cur_group_rows(), sep="_")) %>%
+  ungroup() %>%
+  distinct(uniq_id, .keep_all = T) %>%
+  mutate(across(where(is.double) & !c(ithaID), ~ifelse(.x == 0, NA, .x))) %>% 
+  d_select(! matches("SpliceAI", "ada_score", "rf_score")) %>%
+  d_filter(if_any(where(is.double) & !c(ithaID), ~!is.na(.)))
+
+write.xlsx(concordance_df_tricho %>% as.data.frame(), 
+           file.path(params$plot_path, "plot-source-files",
+                     "Supplementary-Figure-4-data.xlsx"), 
+           sheetName = str_c("Source data"),
+           row.names = F, append = F)
+
+concordance_matr_tricho = concordance_df_tricho %>%
+  d_select(-c(ithaID, effect, pathogenicity, uniq_id, Gene, HGVS)) %>% as.matrix()
+rownames(concordance_matr_tricho) = concordance_df_tricho %>% .[['uniq_id']]
+
+# not any insights froma dding the molecular mechanism
+row_annotation = concordance_df_tricho %>%
+  d_select(effect, pathogenicity, Gene) %>%
+  d_rename(Effect = effect, Pathogenicity = pathogenicity) %>%
+  as.data.frame()
+rownames(row_annotation) = concordance_df_tricho %>% .[['uniq_id']]
+
+anno_colors = list(Effect = setNames(paper_colors, 
+                                      sort(unique(row_annotation$Effect), decreasing=F)), 
+                    Gene = plot_colors,
+                    Pathogenicity = setNames(c("#ff4cff","#4ca6ff"), 
+                                             sort(unique(row_annotation$Pathogenicity), decreasing=T)))
+row_annotation = HeatmapAnnotation(df = row_annotation, which = "row", 
+                                   col = anno_colors, 
+                                   annotation_legend_param = list(title_gp = grid::gpar(fontface = "plain", fontsize = 9)),
+                                   annotation_name_gp = grid::gpar(fontsize = 7), 
+                                   annotation_name_rot = 45)
+
+p = Heatmap(concordance_matr_tricho, show_row_dend = F, na_col="#cfcfcf", show_row_names = F, 
+        name=" ", column_names_rot = 45, col = divergent_colors, 
+        cluster_rows = T, clustering_distance_rows = "euclidean", clustering_method_rows = "complete",
+        column_names_gp = grid::gpar(fontsize = 6),
+        left_annotation = row_annotation, 
+        height = unit(9, "cm"), width = unit(7, "cm"), 
+        heatmap_legend_param = list(by_row=T, color_bar="discrete", at = c(NA, -1,1),
+                                    labels = c( "N/A", "Discordant", "Concordant"),
+                                    title_gp = grid::gpar(fontface = "plain", fontsize = 9) 
+                                    ),
+        ) 
+
+pdf(file.path(params$plot_path, "Supplementary-Figure-4.pdf")) 
+draw(p)
+dev.off()
+```
+
+
+# Supplementary Figure-5
+
+```{r vus-analysis, echo=FALSE, warning=FALSE, message=FALSE}
+vus_stats = read_csv(params$f7) %>%
+  pivot_longer(-Tool) %>%
+  group_by(Tool) %>%
+  mutate(Call = factor(recode(name, !!!setNames(c("P/LP", "B/LB","VUS", "NA"), 
+                                        c("p_cnt", "b_cnt", "vus_cnt","na_cnt"))), 
+                          levels = rev(c("P/LP", "B/LB","VUS", "NA"))), 
+         Tool = recode(Tool, !!!setNames(tool_names_formatted$formatted_name, tool_names_formatted$Tool)), 
+         Tool = factor(Tool, levels = rev(sort(tool_names_formatted$formatted_name))),
+         total = sum(value), 
+         Percent = value/total * 100, 
+         value = ifelse(value == 0, NA, value)) 
+
+v = ggplot(vus_stats %>% d_filter(Tool != "SpliceAI"), aes(x = Tool, fill = Call)) + 
+  geom_bar(stat = "identity", aes(y = Percent)) +
+  geom_text(aes(y= Percent, label = value), 
+            position = position_stack(vjust=0.5),
+            size=3, color = "white") +
+  scale_fill_manual(values = setNames(c("#ff4cff", "#35b235", "#4ca6ff", "grey"),
+                                      c("P/LP", "B/LB", "VUS", "NA"))) +
+  coord_flip() + ylab("Percent") + xlab("") +
+  theme_cowplot(font_size = 10) 
+
+ggsave(v, filename = file.path(params$plot_path, "Supplementary-Figure-5.pdf"))
+```
+
+

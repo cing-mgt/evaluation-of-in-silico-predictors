@@ -1,0 +1,787 @@
+---
+title: "In silico tools prediction of pathogenicity"
+author: "Stella Tamana & Maria Xenophontos"
+date: "14/12/2021"
+output:
+  html_document: default
+  pdf_document: default
+params:
+   f1: ./vep-results-clean-and-extended.csv
+   output_path: ./results
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Definition of measures for evaluating the performance _in silico_ tools prediction of pathogenicity
+
+In this study, we will focus on Single Nucleotide Variants (SNVs) affecting the HBB gene on β-globin locus (NG_000007) and HBA1/2 on α-globin locus (NG_000006). Such variants are collected and annotated on the ITHANET portal (https://www.ithanet.eu) on a regular basis. 
+
+<!-- Import required libraries -->
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+
+#for reproducible results
+set.seed(2584)
+
+options(box.path = getwd())
+#load libraries
+box::use(
+  dplyr[d_filter = filter, d_select = select, ...],
+  # for unite
+  tidyr[...],
+  # for enframe  
+  tibble[...],
+  # for map_chr
+  purrr[...],
+  stringr[...],
+  readr[...],
+  knitr[...],
+  # For pretty-printed tables
+  pander[...],
+  DT[...],
+  readxl[...], 
+  mltools[...], 
+  epiR[...], 
+  xlsx[write.xlsx],
+  source/metrics[...]
+  )
+
+dir.create(params$output_path, recursive = T)
+```
+
+<!-- read tools prediction scores excel and Vep annotation file -->
+```{r import-data, warning = FALSE, message = FALSE, echo = FALSE}
+vep_results =  read_csv(params$f1) 
+
+snvs_cnt  = vep_results %>%
+   group_by(Observed_pathogenicity) %>% 
+   summarise(cnt = n()) %>%
+   bind_rows(tibble(Observed_pathogenicity = "Total", cnt = vep_results %>% nrow))
+
+#get pathogenic snvs
+pathogenic_snvs = vep_results %>% d_filter(Observed_pathogenicity == "P/LP")
+
+#get benign snvs
+benign_snvs = vep_results %>% d_filter(Observed_pathogenicity == "B/LB")
+
+```
+
+#### Single Nucleotide Variants (SNVs) dataset and pre-processing
+
+* **SNVs dataset**
+  * The _list of SNVs and their associated data_ (e.g HGVS name, gene, mutation type and effect on gene/protein function) presented in this study was downloaded from IthaGenes database (part of the ITHANET portal) on **5/2/2020** and consisted of **1685 SNVs** (based on unique ithaIDs).
+
+\vspace{.5cm}
+
+* **Pre-processing of SNVs**
+  * All SNVs that were _not single entries_ in IthaGenes but groupped under a single ithaID (i.e. composed by alternative substitutions in the HBB gene or the substitution was either in HBA1 or HBA2 genes) were seperated into single entries by spliting their HGVS name with the characters  '|' or ' or '.
+    * Leading to a **final dataset** that was composed by **`r snvs_cnt %>% d_filter(Observed_pathogenicity == 'Total') %>% .[['cnt']]` **.
+
+\vspace{.5cm}
+  * The final list was further processed using the batch service of the _Variant validator_ (https://variantvalidator.org/service/validate/batch/) in order to validate all SNVs HGVs name, retrieve their protein HGVS name and correct any annotation errors regarding the SNVs' effect on gene/protein function.
+  
+    * This step was important because we then divided this list into sub-lists (e.g. missense-nucleotide, missense-protein, coding SNVs e.t.c) depending on the required input of each computational tool used in this study.
+
+\vspace{.5cm}
+* **SNVs final datasets**
+  * Below we present some data on the number of SNVs in the final dataset and the various sub-lists we computed.
+  
+  \vspace{.5cm}
+
+```{r print, warning=FALSE, message=FALSE, echo=FALSE, eval=TRUE}
+
+#Show table with vep tools with score predictions
+datatable(snvs_cnt, extensions = "Buttons", options = list(
+  dom = "Bfrtlip",
+    buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+   columnDefs = list(list(className = 'dt-center', targets = "_all"))
+), caption = 'Dataset numbers')
+```
+
+#### Tools performance
+* Here, we will define and describe several measure that assess the _overall performance_ of the computational tools used in this study.
+
+* **Definitions**
+  * **True positive (TP):** the number of SNVs that are _correctly_ predicted as _pathogenic_
+  * **False positive (FP):** the number of SNVs that are _incorrectly_ predicted as _pathogenic_
+  * **True negative (TN):** the number of SNVs that are _correctly_ identified as _benign_
+  * **False negative (FN):** the number of SNVs that are _incorrectly_ identified as _benign_
+
+\vspace{.5cm}
+* The _overal performance_ of each individual computational tool will be assesed using the following measures:
+
+  * **Specificity (Sp):** is a proportion of the true-negative results (i.e. correct identification of benign variants). 
+    * The _specificity_ measure can be computed be the following equation:
+    $$Sp = \frac{TN}{FP + TN}$$
+
+  * **Sensitivity (Se):** is the proportion of the true-positive (i.e. correct identification of pathogenic variants). 
+    * The _sensitivity_ measure can be computed be the following equation:
+    $$Se = \frac{TP}{TP + FN}$$
+
+  * **Accuracy (Ac):** is the ratio of complete correct predictions to the total number of predictions. 
+    * The _accuracy_ ratio can be computes as follows:
+    $$Ac = \frac{TP + TN}{TP + FN + FP + TN}$$
+
+  * **Positive predictive values (PPV):** is the ratio of true-positive results versus all positive results. 
+    * The _PPV_ is calculated by the following equation:
+    $$PPV = \frac{TP}{TP + FP}$$
+
+  * **Negative predictive values (NPV):** is the ration of true-negative results versus all negative results. 
+    * The _NPV_ is calculated by the following equation:
+    $$NPV = \frac{TN}{TN + FN}$$
+
+  * **Yield rate (YR):** is defined as the proportion of variants received benign or deleterious evidence among all evaluated variants (Tian Y. et al., 2019).
+
+  * **Overall Prediction Performance (OPP):** is defined as the root mean square of PPV, NPV and YR (Tian et al. 2019). 
+    * The _OOP_ is computed by: $$OPP = \sqrt{\frac{(PPV^2 + NPV^2 + YR^2)}{3}}$$
+
+  * **_Note_:** Differences in _PPV_, _NPV_ and _YR_ between predictors were each test by Fischer’s exact test while, differences in OPP were tested by a Monte-Carlo permutation test with 10,000 permutations that each randomly exchanged all assigned evidence among comparator predictors (Tian et al. 2019).
+
+  * **Matthews correlation coefficient (MCC):** determines the relationship between the observed values of missense variants and the predicted values of the in silico predictions. 
+    * It takes into account both the number of _true/false_ and _positive/negatives_ and it ranges between -1 and +1. A coefficient of **+1** represents a **perfect prediction**, **0** no better than **random prediction** and **−1** indicates **total disagreement** between prediction and observation. 
+    * _MCC_ can be calculated as follows:
+    $$MCC = \frac{((TP *TN) - (FP *FN))}{\sqrt{((TP + FP)*(TP + FN)*(TN + FP)*(TN + FN))}}$$
+
+  * **Receiver Operating Characteristic (ROC)** curve is a graphical plot expressing the relationship between sensitivity and specificity. 
+   * Is frequently used by bioinformatics analysis to evaluate classification and prediction models for supporting, diagnosis and prognosis (Pshennikowa V. G. et al., 2018). 
+   * _ROC curve_ is constructed by plotting _sensitivity_ (i.e. true-positive ratio) along the Y-axis and _specificity_ (i.e. false-positive ratio) is plotted along X-axis. 
+   * The quantitative interpretation of ROC is given by _AUC (Area Under ROC Curve)_ where the bigger the AUC the better the model (Pshennikowa V. G. et al., 2018).
+   
+* **VEP tools with scores prediction performance**
+  * Graphs of LR+/LR- vs. pathogenic threshold for each VEP tool
+  
+<!-- Calculate TP, TN, FP, FN for each annotation tool with scores in VEP -->
+
+```{r evaluate-continuous-predictions, warning=FALSE, message=FALSE, echo=FALSE}
+# Function for getting min and max scores per tool for our dataset
+min_max = list(
+  min = ~min(.x, na.rm = TRUE), 
+  max = ~max(.x, na.rm = TRUE)
+)
+
+tools = c("SIFT_score","integrated_fitCons_score","MutationTaster_score",
+          "LRT_score", "PolyPhen_score","SpliceAI_DS",
+          "ClinPred_score", "DANN_score","LIST-S2_score_seperated",
+          "MetaSVM_score", "MutPred_score","REVEL_score",
+          "VEST4_score_seperated", "fathmm-MKL_coding_score","ada_score",
+          "rf_score","Condel_score","MetaLR_score",
+          "GERP++_RS", "Eigen-PC-phred_coding", 
+          "BayesDel_addAF_score", "FATHMM_score_seperated",
+          "MutationAssessor_standalone_score",
+          "PROVEAN_score_seperated", "CADD_PHRED", 
+          "phyloP100way_vertebrate", "phyloP30way_mammalian", 
+          "phastCons30way_mammalian", "phastCons17way_primate",
+          "SiPhy_29way_logOdds", "Eigen-phred_coding")
+   
+# Getting min and max scores for each tool and then choising step and thresholds 
+# for each one manually as to include the default threshold too
+th_ranges = vep_results %>% 
+   summarise(across(any_of(tools), min_max)) %>% 
+   pivot_longer(everything(), names_pattern = "(.*)_m[inax]{2}") %>%
+   group_by(name) %>% 
+   summarise(th_range = list(value)) %>% 
+   distinct() %>%
+   rowwise() %>%
+   summarise(tool = name,
+             thresholds = pmap(as.list(th_range), 
+                               function(x, y){
+                                  x = round(x, digits = 2)
+                                  y = round(y, digits = 2)
+                                  round(seq(x, y, length.out=19), digits = 2)
+                               }))
+
+#threshold steps
+thresholds = vep_results %>% 
+   d_select(-(1:10), -matches('_pred')) %>%
+   colnames() %>% as_tibble() %>% rename(tool = value) %>%
+   mutate( th = case_when(
+                     # for CADD increasing threshold above 30 as requested by Petros
+                     tool == "CADD_PHRED" ~list(c(th_ranges %>%
+                                                     d_filter(tool == "CADD_PHRED") %>% 
+                                                     .[['thresholds']] %>% 
+                                                     unlist, 
+                                                  15)),
+                     tool == "BayesDel_addAF_score" ~list(c(th_ranges %>% 
+                                                               d_filter(tool == "BayesDel_addAF_score") %>%
+                                                               .[['thresholds']] %>% 
+                                                               unlist,
+                                                            0.0692655)), 
+                     tool == "Eigen-PC-phred_coding" ~list(c(th_ranges %>% 
+                                                                d_filter(tool == "Eigen-PC-phred_coding") %>%
+                                                                .[['thresholds']] %>% 
+                                                                unlist, 
+                                                             9)), 
+                     # double check this because I think the range of the score is bigger
+                     # changing from seq(0, 5.5, 0.5)
+                     tool == "FATHMM_score_seperated" ~list(c(th_ranges %>% 
+                                                                 d_filter(tool == "FATHMM_score_seperated") %>%
+                                                                 .[['thresholds']] %>% 
+                                                                 unlist, 
+                                                              -1.5)), 
+                     tool == "MutationAssessor_standalone_score" ~ list(c(th_ranges %>% 
+                                                                             d_filter(tool == "MutationAssessor_standalone_score") %>%
+                                                                             .[['thresholds']] %>% 
+                                                                             unlist, 
+                                                                          1.935)),
+                     tool == "PROVEAN_score_seperated" ~list(c(th_ranges %>% 
+                                                                  d_filter(tool == "PROVEAN_score_seperated") %>%
+                                                                  .[['thresholds']] %>% 
+                                                                  unlist, 
+                                                               -2.5)),
+                     tool == "GERP++_RS" ~list(c(th_ranges %>% 
+                                                      d_filter(tool == "GERP++_RS") %>%
+                                                      .[['thresholds']] %>% 
+                                                      unlist, 
+                                                   0)),
+                     tool == "phyloP100way_vertebrate" ~ (th_ranges %>% 
+                                                             d_filter(tool == "phyloP100way_vertebrate") %>%
+                                                             .[['thresholds']] ),
+                     tool == "phyloP30way_mammalian" ~ (th_ranges %>% 
+                                                           d_filter(tool == "phyloP30way_mammalian") %>%
+                                                           .[['thresholds']]),
+                     tool == "phastCons30way_mammalian" ~ (th_ranges %>% 
+                                                              d_filter(tool == "phastCons30way_mammalian") %>%
+                                                              .[['thresholds']]),
+                     tool == "phastCons17way_primate" ~ (th_ranges %>% 
+                                                            d_filter(tool == "phastCons17way_primate") %>%
+                                                            .[['thresholds']]),
+                     tool == "SiPhy_29way_logOdds" ~ (th_ranges %>% 
+                                                         d_filter(tool == "SiPhy_29way_logOdds") %>%
+                                                         .[['thresholds']]),
+                     tool == "Eigen-phred_coding" ~ (th_ranges %>% 
+                                                        d_filter(tool == "Eigen-phred_coding") %>%
+                                                        .[['thresholds']]),
+                     tool == "PolyPhen_score" ~list(c(seq(0.05, 0.95, 0.05), 0.447)),
+                     tool == "DANN_score" ~list(c(seq(0.05, 0.95, 0.05), 0.96)),
+                     tool == "LRT_score" ~list(c(seq(0.05, 0.95, 0.05), 0.01)),
+                     tool == "Condel_score" ~list(c(seq(0.05, 0.95, 0.05), 0.49)),
+                     tool %in%  c("SIFT_score","integrated_fitCons_score","MutationTaster_score",
+                                  "SpliceAI_DS","ClinPred_score","LIST-S2_score_seperated",
+                                  "MetaSVM_score", "MutPred_score","REVEL_score",
+                                  "VEST4_score_seperated", "fathmm-MKL_coding_score","ada_score",
+                                  "rf_score","","MetaLR_score") ~list(seq(0.05,0.95, by=0.05))), 
+           th_class = case_when(
+                     tool %in% c("SIFT_score","LRT_score") ~ 'below', 
+                     tool %in% c("FATHMM_score_seperated", "PROVEAN_score_seperated") ~ "below_closed",
+                     tool %in% c("Condel_score", "integrated_fitCons_score",
+                                 "MutationTaster_score", "PolyPhen_score", 
+                                 "SpliceAI_DS", "DANN_score",
+                                 "ClinPred_score", "MetaSVM_score",
+                                 "MutPred_score","REVEL_score",
+                                 "VEST4_score_seperated",
+                                 "fathmm-MKL_coding_score","ada_score",
+                                 "rf_score","MetaLR_score",
+                                 "GERP++_RS", "CADD_PHRED",
+                                 "Eigen-PC-phred_coding", "MutationAssessor_standalone_score", 
+                                 "phyloP100way_vertebrate", "phyloP30way_mammalian", 
+                                 "phastCons30way_mammalian", "phastCons17way_primate", 
+                                 "SiPhy_29way_logOdds", "Eigen-phred_coding") ~ "above",
+                     tool %in% c("LIST-S2_score_seperated", "BayesDel_addAF_score") ~ 'above_closed'
+                     )) %>% 
+   unnest(th) %>%
+   # in case some of the default thresholds are already in the bins constructed
+   distinct()
+
+# Removing threshold runs for tools that only make sense running on splice SNVs
+thresholds = thresholds %>% d_filter(!tool %in% c("SpliceAI_DS", "rf_score", "ada_score"))
+
+# write to file the threshold steps used 
+write_csv(thresholds, file = file.path(params$output_path, "continuous-threshold-config.csv"))
+
+# keeping just for comparison with the paper and the script for plots
+default_threshold = tibble(tool = c("SIFT_score","integrated_fitCons_score","MutationTaster_score",
+                                    "LRT_score", "PolyPhen_score","SpliceAI_DS",
+                                    "ClinPred_score", "DANN_score","LIST-S2_score_seperated",
+                                    "MetaSVM_score", "MutPred_score","REVEL_score",
+                                    "VEST4_score_seperated", "fathmm-MKL_coding_score","ada_score",
+                                    "rf_score","Condel_score","MetaLR_score",
+                                    "GERP++_RS", "Eigen-PC-phred_coding", 
+                                    "BayesDel_addAF_score", "FATHMM_score_seperated",
+                                    "MutationAssessor_standalone_score",
+                                    "PROVEAN_score_seperated", "CADD_PHRED", 
+                                    "phyloP100way_vertebrate", "phyloP30way_mammalian", 
+                                    "phastCons30way_mammalian", "phastCons17way_primate", 
+                                    "SiPhy_29way_logOdds", "Eigen-phred_coding"), 
+                           th = c(0.05, 0.5, 0.5,
+                                  0.01, 0.447, 0.5,
+                                  0.5, 0.96, 0.85, 
+                                  0, 0.5, 0.75, 
+                                  0.5, 0.5, 0.6, 
+                                  0.6, 0.49, 0.5,
+                                  0, 9, 
+                                  0.0692655, -1.5, 1.935, 
+                                  -2.5, 15,
+                                  NA, NA,
+                                  NA, NA,
+                                  NA, NA
+                                  )) %>%
+   left_join(thresholds %>% d_select(-th) %>% distinct(), by = "tool")
+
+
+
+r_continuous = pmap_dfr(thresholds %>% d_filter(!is.na(th) & !is.na(th_class)), 
+                        compute_metrics_for_continuous,
+                        predictions = vep_results, 
+                        pathogenic = pathogenic_snvs,
+                        benign = benign_snvs) %>%
+   #round numeric values to 2 point decimals
+   # but not with mutate_if(is.numeric, ~round(., 2))
+   # because then the thresholds are also rounded
+   mutate(across(11:24, ~round(., 2)))
+
+unlink(file.path(params$output_path, str_c("performance-evaluation-continuous.xlsx")))
+write.xlsx(r_continuous %>% as.data.frame(), 
+          file.path(params$output_path, 
+                           str_c("performance-evaluation-continuous.xlsx")), 
+          sheetName = "Varied prediction threshold",
+          row.names = F, append = F)
+
+# Thresholds maximizing the MCC
+max_mcc_threshold = r_continuous %>% 
+   group_by(Tool) %>% 
+   arrange(desc(MCC)) %>% 
+   d_select(Tool, Threshold, MCC) %>%
+   slice(1)
+
+#write table in file
+write_csv(max_mcc_threshold, file = file.path(params$output_path, "mcc-maximizing-thresholds.csv"))
+```
+
+```{r filter-th, message=FALSE, echo=FALSE}
+
+r_continuous_default_threshold = r_continuous %>%
+   inner_join(default_threshold %>% rename(Threshold = th, Tool = tool), by=c("Tool", "Threshold")) %>%
+   d_select(-th_class)
+
+write.xlsx(r_continuous_default_threshold %>% as.data.frame(), 
+          file.path(params$output_path, 
+                           str_c("performance-evaluation-continuous.xlsx")), 
+          sheetName = "At default thresholds",
+          row.names = F, append = T)
+
+r_continuous_max_mcc_threshold = r_continuous %>%
+  inner_join(max_mcc_threshold, by=c("Tool", "Threshold", "MCC"))
+
+write.xlsx(r_continuous_max_mcc_threshold %>% as.data.frame(), 
+          file.path(params$output_path, 
+                           str_c("performance-evaluation-continuous.xlsx")), 
+          sheetName = "At MCC maximizing thresholds",
+          row.names = F, append = T)
+
+# Formatting data for Table 1 of paper
+table_1 = r_continuous_max_mcc_threshold %>%
+   left_join(default_threshold %>% rename(Tool = tool) %>% d_select(-th) %>% distinct(),
+             by =c("Tool") ) %>%
+   arrange(Tool) %>%
+   mutate(`LR+ 95% CI` = str_c("[", `LR+_CI_lower`, ", ",  `LR+_CI_upper` ,"]"), 
+          `LR- 95% CI` = str_c("[", `LR-_CI_lower`, ", ", `LR-_CI_upper` ,"]"), 
+          `Impact Threshold`  = case_when(th_class == "above_closed" ~ str_c(">=", Threshold), 
+                                          th_class == "above" ~ str_c(">", Threshold), 
+                                          th_class == "below_closed" ~ str_c("<=", Threshold), 
+                                          th_class == "below" ~ str_c("<", Threshold), 
+                                          )
+          ) %>%
+   rename(`#PV` = PV_NV) %>%
+   d_select(Tool, `Impact Threshold`, `#PV`, 
+            TP, FN, FP, TN, 
+            Accuracy, Sensitivity, Specificity, MCC,
+            `LR+`,`LR+ 95% CI`, `LR-`, `LR- 95% CI`)
+
+write.xlsx(table_1 %>% as.data.frame(), 
+          file.path(params$output_path, 
+                           str_c("performance-evaluation-continuous.xlsx")), 
+          sheetName = "Table 1",
+          row.names = F, append = T)
+```
+<!-- Calculate performance measures of VEP tools and show table -->
+
+```{r print-2, warning=FALSE, message=FALSE, echo=FALSE, eval=TRUE}
+
+#Show table with vep tools with score predictions
+datatable(r_continuous, extensions = "Buttons", options = list(
+  dom = "Bfrtlip",
+    buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+   columnDefs = list(list(className = 'dt-center', targets = "_all"))
+), caption = 'Table 2: VEP tools with score predictions performance.')
+
+```
+
+```{r stats-4-missense-subset, warning = F, message = F, echo = F}
+missense = vep_results %>% 
+   d_filter(str_detect(Effect_function, "[Mm]issense"))
+missense_pathogenic = missense %>% 
+   d_filter(str_detect(Observed_pathogenicity, "P/LP"))
+missense_benign = missense %>% 
+   d_filter(str_detect(Observed_pathogenicity, "B/LB"))
+
+r_continuous_missense = pmap_dfr(thresholds %>% d_filter(!is.na(th) & !is.na(th_class)),
+                                  compute_metrics_for_continuous, 
+                                  predictions = missense,
+                                  pathogenic = missense_pathogenic, 
+                                  benign = missense_benign) %>%
+   #round numeric values to 2 point decimals
+   mutate_if(is.numeric, ~round(., 2))
+
+write.xlsx(missense %>% as.data.frame(), 
+          file.path(params$output_path, 
+                           str_c("performance-evaluation-subsets.xlsx")), 
+          sheetName = "Input-Missense",
+          row.names = F, append = F)
+write.xlsx(r_continuous_missense %>% as.data.frame(), 
+          file.path(params$output_path, 
+                           str_c("performance-evaluation-subsets.xlsx")), 
+          sheetName = "Missense",
+          row.names = F, append = T)
+```
+
+```{r stats-4-non-missense-subset, warning = F, message = F, echo = F}
+non_missense = vep_results %>% 
+   d_filter(str_detect(Effect_function, "[Mm]issense", negate = T))
+non_missense_pathogenic = non_missense %>% 
+   d_filter(str_detect(Observed_pathogenicity, "P/LP"))
+non_missense_benign = non_missense %>% 
+   d_filter(str_detect(Observed_pathogenicity, "B/LB"))
+
+r_continuous_non_missense = pmap_dfr(thresholds %>% d_filter(!is.na(th) & !is.na(th_class)),
+                                  compute_metrics_for_continuous, 
+                                  predictions = non_missense,
+                                  pathogenic = non_missense_pathogenic, 
+                                  benign = non_missense_benign) %>%
+   #round numeric values to 2 point decimals
+   mutate_if(is.numeric, ~round(., 2))
+
+write.xlsx(non_missense %>% as.data.frame(), 
+          file.path(params$output_path, 
+                           str_c("performance-evaluation-subsets.xlsx")), 
+          sheetName = "Input-Non Missense",
+          row.names = F, append = T)
+write.xlsx(r_continuous_non_missense %>% as.data.frame(), 
+          file.path(params$output_path, 
+                           str_c("performance-evaluation-subsets.xlsx")), 
+          sheetName = "Non Missense",
+          row.names = F, append = T)
+```
+
+```{r stats-4-hba1-subset, warning = F, message = F, echo = F}
+hba1 = vep_results %>% 
+   separate(HGVS, c("Gene", "tmp"), sep= ":", remove = F) %>%
+   mutate(Gene = case_when(Gene %in% c('HBA1', 'HBA2', 'HBB') ~ Gene, 
+                           Gene == 'NG_000007.3' ~ 'HBB', 
+                           Gene == 'NM_000517.4' ~ 'HBA2', 
+                           )) %>%
+   d_filter(Gene %in% c('HBA1'))
+hba1_pathogenic = hba1 %>% 
+   d_filter(str_detect(Observed_pathogenicity, "P/LP"))
+hba1_benign = hba1 %>% 
+   d_filter(str_detect(Observed_pathogenicity, "B/LB"))
+
+r_continuous_hba1 = pmap_dfr(thresholds %>% d_filter(!is.na(th) & !is.na(th_class)),
+                                  compute_metrics_for_continuous, 
+                                  predictions = hba1,
+                                  pathogenic = hba1_pathogenic, 
+                                  benign = hba1_benign) %>%
+   #round numeric values to 2 point decimals
+   mutate_if(is.numeric, ~round(., 2))
+
+write.xlsx(hba1 %>% as.data.frame(), 
+          file.path(params$output_path, 
+                           str_c("performance-evaluation-subsets.xlsx")), 
+          sheetName = "Input-HBA1",
+          row.names = F, append = T)
+write.xlsx(r_continuous_hba1 %>% as.data.frame(), 
+          file.path(params$output_path, 
+                           str_c("performance-evaluation-subsets.xlsx")), 
+          sheetName = "HBA1",
+          row.names = F, append = T)
+```
+
+```{r stats-4-hba2-subset, warning = F, message = F, echo = F}
+hba2 = vep_results %>% 
+   separate(HGVS, c("Gene", "tmp"), sep= ":", remove = F) %>%
+   mutate(Gene = case_when(Gene %in% c('HBA1', 'HBA2', 'HBB') ~ Gene, 
+                           Gene == 'NG_000007.3' ~ 'HBB', 
+                           Gene == 'NM_000517.4' ~ 'HBA2', 
+                           )) %>%
+   d_filter(Gene %in% c('HBA2'))
+hba2_pathogenic = hba2 %>% 
+   d_filter(str_detect(Observed_pathogenicity, "P/LP"))
+hba2_benign = hba2 %>% 
+   d_filter(str_detect(Observed_pathogenicity, "B/LB"))
+
+r_continuous_hba2 = pmap_dfr(thresholds %>% d_filter(!is.na(th) & !is.na(th_class)),
+                                  compute_metrics_for_continuous, 
+                                  predictions = hba2,
+                                  pathogenic = hba2_pathogenic, 
+                                  benign = hba2_benign) %>%
+   #round numeric values to 2 point decimals
+   mutate_if(is.numeric, ~round(., 2))
+
+write.xlsx(hba2 %>% as.data.frame(), 
+          file.path(params$output_path, 
+                           str_c("performance-evaluation-subsets.xlsx")), 
+          sheetName = "Input-HBA2",
+          row.names = F, append = T)
+write.xlsx(r_continuous_hba2 %>% as.data.frame(), 
+          file.path(params$output_path, 
+                           str_c("performance-evaluation-subsets.xlsx")), 
+          sheetName = "HBA2",
+          row.names = F, append = T)
+```
+
+```{r stats-4-hbb-subset, warning = F, message = F, echo = F}
+hbb = vep_results %>% 
+   separate(HGVS, c("Gene", "tmp"), sep= ":", remove = F) %>%
+   mutate(Gene = case_when(Gene %in% c('HBA1', 'HBA2', 'HBB') ~ Gene, 
+                           Gene == 'NG_000007.3' ~ 'HBB', 
+                           Gene == 'NM_000517.4' ~ 'HBA2', 
+                           )) %>%
+   d_filter(Gene %in% c('HBB'))
+hbb_pathogenic = hbb %>% 
+   d_filter(str_detect(Observed_pathogenicity, "P/LP"))
+hbb_benign = hbb %>% 
+   d_filter(str_detect(Observed_pathogenicity, "B/LB"))
+
+r_continuous_hbb = pmap_dfr(thresholds %>% d_filter(!is.na(th) & !is.na(th_class)),
+                                  compute_metrics_for_continuous, 
+                                  predictions = hbb,
+                                  pathogenic = hbb_pathogenic, 
+                                  benign = hbb_benign) %>%
+   #round numeric values to 2 point decimals
+   mutate_if(is.numeric, ~round(., 2))
+
+write.xlsx(hbb %>% as.data.frame(), 
+          file.path(params$output_path, 
+                           str_c("performance-evaluation-subsets.xlsx")), 
+          sheetName = "Input-HBB",
+          row.names = F, append = T)
+write.xlsx(r_continuous_hbb %>% as.data.frame(), 
+          file.path(params$output_path, 
+                           str_c("performance-evaluation-subsets.xlsx")), 
+          sheetName = "HBB",
+          row.names = F, append = T)
+```
+
+```{r splicing-tools, warning = F, message= F, echo = F}
+effect_cat_mapping = setNames(c("Regulatory", "Regulatory",
+                                "Initiation", "Frameshift",
+                                "Stop gained", "Splicing",
+                                "Synonymous", "Splicing",
+                                "Splicing", "Missense",
+                                # WORD OF CAUTION!!!!
+                                # this is different from how variants are annotated in
+                                # make-plots.Rmd
+                                "Splicing", "Missense Plus",
+                                "Splicing", "Splicing",
+                                "Splicing", "Splicing",
+                                "Splicing", "Splicing",
+                                "Frameshift", "Inframe indels",
+                                "Splicing", "Unknown effect",
+                                "Regulatory", "Regulatory", 
+                                "Splicing", "Stop lost", 
+                                "Regulatory", "Stop gained", 
+                                "Splicing", "Splicing", "Splicing"),
+                              c("Promoter", "5'UTR",
+                                "Initiation codon", "Frameshift",
+                                "Stop gained", "Cryptic splice site; Missense codons",
+                                "Synonymous substitution", "Missense codons; Cryptic splice site",
+                                "Cryptic splice site; Synonymous substitution", "Missense codons",
+                                "Splice region variant; Synonymous substitution", "Splice region variant; Missense codons",
+                                "Splice donor", "Splice region variant",
+                                "Cryptic splice site", "Splice acceptor",
+                                "Splice region variant; Splice acceptor", "Splice region variant; Inframe indels",
+                                "Splice region variant; Frameshift", "Inframe indels",
+                                "Splice region variant; Splice donor", "NA",
+                                "Other 3'UTR site", "RNA cleavage - Poly(A) signal",
+                                "Splice region variant; Splice acceptor; Inframe indels", "Stop lost",
+                                "Downstream transcript variant", "Splice region variant; Stop gained", 
+                                "Missense codons, Cryptic splice site", "Cryptic splice site, Synonymous substitution", "Splice region variant, Inframe indels"))
+
+# true positives based on: P/LP + Splicing (excluding those that are splicing+missense)
+# true negatives based on: P/LP or B/LB with annotation anything other than splicing+missense
+splicing_positive = vep_results %>%
+   mutate(effect = recode(Effect_function, !!!effect_cat_mapping)) %>%
+   d_filter(str_detect(Observed_pathogenicity, "P/LP") & str_detect(effect,"Splicing"))
+
+splicing_negative = vep_results %>%
+   mutate(effect = recode(Effect_function, !!!effect_cat_mapping)) %>%
+   d_filter(str_detect(effect, "Splicing", negate = T) & effect != "Missense Plus" & Observed_pathogenicity != "VUS")
+
+splicing_subset = bind_rows(splicing_positive, splicing_negative) 
+
+thresholds_splicing = vep_results %>% 
+   d_select(-(1:9), -matches('_pred')) %>%
+   colnames() %>% as_tibble() %>% rename(tool = value) %>%
+   mutate( th = case_when(
+                     tool %in%  c("SpliceAI_DS","ada_score","rf_score") ~list(seq(0.05,0.95, by=0.05))), 
+           th_class = case_when(
+                     tool %in%  c("SpliceAI_DS","ada_score","rf_score") ~ 'above')) %>% 
+   unnest(th)
+
+write_csv(thresholds_splicing, file = file.path(params$output_path, 
+                                                "continuous-threshold-splicing-config.csv"))
+
+r_continuous_splicing = pmap_dfr(thresholds_splicing %>% d_filter(!is.na(th) & !is.na(th_class)), 
+                                   compute_metrics_for_continuous, predictions = splicing_subset,
+                                   pathogenic = splicing_positive, 
+                                   benign = splicing_negative)
+r_continuous_splicing = r_continuous_splicing %>% 
+   #round numeric values to 2 point decimals
+   mutate_if(is.numeric, ~round(., 2))
+
+unlink(file.path(params$output_path, str_c("performance-evaluation-splicing.xlsx")))
+write.xlsx(splicing_subset %>% as.data.frame(), 
+          file.path(params$output_path,  
+                    str_c("performance-evaluation-splicing.xlsx")), 
+          sheetName = "Input-Splicing subset",
+          row.names = F, append = F)
+write.xlsx(r_continuous_splicing %>% as.data.frame(), 
+          file.path(params$output_path, 
+                    str_c("performance-evaluation-splicing.xlsx")), 
+          sheetName = "Varied prediction thresholds",
+          row.names = F, append = T)
+
+max_mcc_threshold_splicing = r_continuous_splicing %>% 
+   group_by(Tool) %>% 
+   arrange(desc(MCC)) %>% 
+   d_select(Tool, Threshold, MCC) %>%
+   slice(1)
+
+#write table in file
+write_csv(max_mcc_threshold_splicing, file = file.path(params$output_path, 
+                                                       "mcc-maximizing-thresholds-splicing-1.csv"))
+write.xlsx(max_mcc_threshold_splicing %>% as.data.frame(), 
+          file.path(params$output_path,
+                    str_c("performance-evaluation-splicing.xlsx")), 
+          sheetName = "Thresholds maximizing MCC",
+          row.names = F, append = T)
+
+r_continuous_max_mcc_threshold_splicing = r_continuous_splicing %>%
+  inner_join(max_mcc_threshold_splicing, by=c("Tool", "Threshold", "MCC"))
+
+write.xlsx(r_continuous_max_mcc_threshold_splicing %>% as.data.frame(), 
+          file.path(params$output_path,
+                    str_c("performance-evaluation-splicing.xlsx")), 
+          sheetName = "At MCC maximizing thresholds",
+          row.names = F, append = T)
+
+table_1_ext = r_continuous_max_mcc_threshold_splicing %>%
+   left_join(default_threshold %>% rename(Tool = tool) %>% d_select(-th) %>% distinct(),
+             by =c("Tool") ) %>%
+   arrange(Tool) %>%
+   mutate(`LR+ 95% CI` = str_c("[", `LR+_CI_lower`, ", ", `LR+_CI_upper` ,"]"), 
+          `LR- 95% CI` = str_c("[", `LR-_CI_lower`, ", ", `LR-_CI_upper` ,"]"), 
+          `Impact Threshold`  = case_when(th_class == "above_closed" ~ str_c(">=", Threshold), 
+                                          th_class == "above" ~ str_c(">", Threshold), 
+                                          th_class == "below_closed" ~ str_c("<=", Threshold), 
+                                          th_class == "below" ~ str_c("<", Threshold), 
+                                          )
+          ) %>%
+   rename(`#PV` = PV_NV) %>%
+   d_select(Tool, `Impact Threshold`, `#PV`, 
+            TP, FN, FP, TN, 
+            Accuracy, Sensitivity, Specificity, MCC,
+            `LR+`,`LR+ 95% CI`, `LR-`, `LR- 95% CI`)
+
+write.xlsx(table_1_ext %>% as.data.frame(), 
+          file.path(params$output_path, 
+                    str_c("performance-evaluation-splicing.xlsx")), 
+          sheetName = "Table 1",
+          row.names = F, append = T)
+```
+
+```{r maxentscan, warning = F, message = F, echo = F}
+# MaxEntScan has two thresholds so instead of extending the function running it here
+# as it is just one tool with this behaviour
+thresholds_maxent = tibble( th1 = list(c(0.5, 1, 1.5, 2, 2.5, 3, 
+                                         3.5, 4, 4.5, 
+                                         5, 5.5, 6, 
+                                         6.5, 7, 7.5,
+                                         8, 8.5, 9, 
+                                         9.5, 10, 10.5,
+                                         11, 11.5, 11.81, 
+                                         12, 12.5, 13, 13.5)), 
+                            th2 = list(c(5, 10, 15, 20, 25, 30, 35, 40, 45, 50))) %>% 
+   unnest(th1) %>%
+   unnest(th2) %>%
+   mutate(tool_1 = "MaxEntScan_diff", 
+          tool_2 = "MaxEntScan_score")
+
+r_continuous_splicing_maxent = pmap_dfr(thresholds_maxent, compute_metrics_for_maxentscan,
+                                 predictions = splicing_subset,
+                                 pathogenic = splicing_positive,
+                                 benign = splicing_negative)
+r_continuous_splicing_maxent = r_continuous_splicing_maxent %>% 
+   #round numeric values to 2 point decimals
+   mutate_if(is.numeric, ~round(., 2))
+   
+write.xlsx(r_continuous_splicing_maxent %>% as.data.frame(), 
+          file.path(params$output_path, 
+                    str_c("performance-evaluation-splicing.xlsx")), 
+          sheetName = "MaxentScan-Varied prediction th",
+          row.names = F, append = T)
+
+max_mcc_threshold_splicing = r_continuous_splicing_maxent %>% 
+   arrange(desc(MCC)) %>% 
+   d_select(Tool_1, Tool_2, Threshold_1, Threshold_2, MCC) %>%
+   slice(1)
+
+# write table in file
+write_csv(max_mcc_threshold_splicing, file = file.path(params$output_path,
+                                                       "mcc-maximizing-thresholds-splicing-2.csv"))
+write.xlsx(max_mcc_threshold_splicing %>% as.data.frame(), 
+          file.path(params$output_path, str_c("performance-evaluation-splicing.xlsx")), 
+          sheetName = "MaxentScan-Th. maximizing MCC",
+          row.names = F, append = T)
+
+vep_results_mcc_max_th_splicing = r_continuous_splicing_maxent %>%
+  inner_join(max_mcc_threshold_splicing, by=c("Tool_1", "Tool_2", "Threshold_1", "Threshold_2", "MCC"))
+
+write.xlsx(vep_results_mcc_max_th_splicing %>% as.data.frame(), 
+          file.path(params$output_path, str_c("performance-evaluation-splicing.xlsx")), 
+          sheetName = "MaxentScan-At MCC maximizing th",
+          row.names = F, append = T)
+
+```
+
+```{r concordance, warning = F, message = F, echo = F}
+recommended_threshold = max_mcc_threshold %>% 
+   rename(th = Threshold, tool = Tool) %>%
+   d_select(-MCC) %>%
+   left_join(default_threshold %>% d_select(-th), by = "tool")
+
+pathogenic_binary = pathogenic_snvs %>% 
+   d_select(c('ithaID', 'HGVS', recommended_threshold %>% .[['tool']])) %>% 
+   pivot_longer(-c(ithaID, HGVS), names_to = "tool", values_to = "value") %>% 
+   left_join(recommended_threshold, by="tool") %>% 
+   mutate(concordance = case_when(th_class == "below" & value < th ~ 1,
+                                  th_class == "below_closed" & value <= th ~ 1, 
+                                  th_class == "above" & value > th ~ 1, 
+                                  th_class == "above_closed" & value >= th ~ 1, 
+                                  !is.na(value) ~0,
+                                  )) %>%
+    pivot_wider(-c('value', 'th', 'th_class'), names_from = "tool", values_from = "concordance") 
+
+#write table in file
+write_csv(pathogenic_binary, file = file.path(params$output_path, "pathogenic_binary.csv"))
+
+benign_binary = benign_snvs %>% 
+   d_select(c('ithaID', 'HGVS', recommended_threshold %>% .[['tool']])) %>% 
+   pivot_longer(-c(ithaID, HGVS), names_to = "tool", values_to = "value") %>% 
+   left_join(recommended_threshold, by="tool") %>% 
+   mutate(concordance = case_when(th_class == "below" & value >= th ~ 1,
+                                  th_class == "below_closed" & value > th ~ 1, 
+                                  th_class == "above" & value <= th ~ 1, 
+                                  th_class == "above_closed" & value < th ~ 1, 
+                                  !is.na(value) ~0,
+                                  )) %>%
+    pivot_wider(-c('value', 'th', 'th_class'), names_from = "tool", values_from = "concordance") 
+
+concordance = bind_rows(pathogenic_binary, benign_binary)
+#write table in file
+write_csv(benign_binary, file = file.path(params$output_path, "benign_binary.csv"))
+
+
+```
+
