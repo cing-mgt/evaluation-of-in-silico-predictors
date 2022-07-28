@@ -1,0 +1,200 @@
+---
+title: "make-supplementary-tables"
+author: "Stella Tamana & Maria Xenophontos"
+date: "2022-07-28"
+output: html_document
+params:
+  f1: ./vep-results-clean-and-extended.csv
+  f2.1: ./results/performance-evaluation-continuous.xlsx
+  f2.2: ./results/performance-evaluation-splicing.xlsx
+  f2.3: ./results/performance-evaluation-subsets.xlsx
+  f3.1: ./results/at-refined-thresholds/performance-evaluation-continuous.xlsx
+  f3.2: ./results/at-refined-thresholds/performance-evaluation-continuous-Missense.xlsx
+  f3.3: ./results/at-refined-thresholds/performance-evaluation-continuous-Non-Missense.xlsx
+  f3.4: ./results/at-refined-thresholds/performance-evaluation-continuous-HBA1.xlsx
+  f3.5: ./results/at-refined-thresholds/performance-evaluation-continuous-HBA2.xlsx
+  f3.6: ./results/at-refined-thresholds/performance-evaluation-continuous-HBB.xlsx
+  output_path: ./results
+---
+
+```{r eval = FALSE, echo = FALSE}
+rmarkdown::render('"make-supplementary-tables.Rmd', params=params)
+```
+
+```{r echo = FALSE, warning = FALSE}
+# allowing java to use more memory
+options(java.parameters = "-Xmx8000m")
+
+box::use(
+  dplyr[d_filter = filter, d_select = select, d_rename = rename, ...],
+  # for unite
+  tidyr[...],
+  # for enframe  
+  tibble[...],
+  # for map_chr
+  purrr[...],
+  stringr[...],
+  readr[...],
+  # For pretty-printed tables
+  readxl[...], 
+  xlsx[write.xlsx],
+  )
+```
+
+# Supplementary File 2
+
+```{r echo=FALSE, warning=FALSE}
+
+input_full_ds = read_csv(params$f1)
+write.xlsx(input_full_ds %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-2.xlsx"), 
+           sheetName = str_c("Input-Full dataset"),
+           row.names = F, append = F)
+
+r_full_ds = read_xlsx(params$f2.1, sheet="Varied prediction threshold")
+write.xlsx(r_full_ds %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-2.xlsx"), 
+           sheetName = str_c("On Full dataset"),
+           row.names = F, append = T)
+
+input_splicing = read_xlsx(params$f2.2, sheet="Input-Splicing subset")
+write.xlsx(input_splicing %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-2.xlsx"), 
+           sheetName = str_c("Input-Splicing"),
+           row.names = F, append = T)
+
+r_splicing = read_xlsx(params$f2.2, sheet="Varied prediction thresholds")
+write.xlsx(r_splicing %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-2.xlsx"), 
+           sheetName = str_c("On Splicing"),
+           row.names = F, append = T)
+
+r_splicing_maxentscan = read_xlsx(params$f2.2, sheet="MaxentScan-Varied prediction th")
+write.xlsx(r_splicing_maxentscan %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-2.xlsx"), 
+           sheetName = str_c("On Splicing (MaxentSscan)"),
+           row.names = F, append = T)
+
+input_missense = read_xlsx(params$f2.3, sheet="Input-Missense")
+write.xlsx(input_missense %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-2.xlsx"), 
+           sheetName = str_c("Input-Missense"),
+           row.names = F, append = T)
+
+r_missense = read_xlsx(params$f2.3, sheet="Missense")
+write.xlsx(r_missense %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-2.xlsx"), 
+           sheetName = str_c("On Missense"),
+           row.names = F, append = T)
+
+input_non_missense = read_xlsx(params$f2.3, sheet="Input-Non Missense")
+write.xlsx(input_non_missense %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-2.xlsx"), 
+           sheetName = str_c("Input-Non Missense"),
+           row.names = F, append = T)
+
+r_non_missense = read_xlsx(params$f2.3, sheet="Non Missense")
+write.xlsx(r_non_missense %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-2.xlsx"), 
+           sheetName = str_c("On Non Missense"),
+           row.names = F, append = T)
+
+input_hba1 = read_xlsx(params$f2.3, sheet="Input-HBA1")
+write.xlsx(input_hba1 %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-2.xlsx"), 
+           sheetName = str_c("Input-HBA1"),
+           row.names = F, append = T)
+
+r_hba1 = read_xlsx(params$f2.3, sheet="HBA1")
+write.xlsx(r_hba1 %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-2.xlsx"), 
+           sheetName = str_c("On HBA1"),
+           row.names = F, append = T)
+
+input_hba2 = read_xlsx(params$f2.3, sheet="Input-HBA2")
+write.xlsx(input_hba2 %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-2.xlsx"), 
+           sheetName = str_c("Input-HBA2"),
+           row.names = F, append = T)
+
+r_hba2 = read_xlsx(params$f2.3, sheet="HBA2")
+write.xlsx(r_hba2 %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-2.xlsx"), 
+           sheetName = str_c("On HBA2"),
+           row.names = F, append = T)
+
+input_hbb = read_xlsx(params$f2.3, sheet="Input-HBB")
+write.xlsx(input_hbb %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-2.xlsx"), 
+           sheetName = str_c("Input-HBB"),
+           row.names = F, append = T)
+
+r_hbb = read_xlsx(params$f2.3, sheet="HBB")
+write.xlsx(r_hbb %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-2.xlsx"), 
+           sheetName = str_c("On HBB"),
+           row.names = F, append = T)
+```
+
+# Supplementary File 3
+
+```{r echo=FALSE, warning=FALSE}
+
+
+r_full_ds = read_xlsx(params$f3.1, sheet="Suggested threshold")
+write.xlsx(r_full_ds %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-3.xlsx"), 
+           sheetName = str_c("On Full dataset & splicing"),
+           row.names = F, append = F)
+
+r_missense = read_xlsx(params$f3.2, sheet="Suggested threshold")
+write.xlsx(r_missense %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-3.xlsx"), 
+           sheetName = str_c("On Missense"),
+           row.names = F, append = T)
+
+r_non_missense = read_xlsx(params$f3.3, sheet="Suggested threshold")
+write.xlsx(r_non_missense %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-3.xlsx"), 
+           sheetName = str_c("On Non Missense"),
+           row.names = F, append = T)
+
+r_hba1 = read_xlsx(params$f3.4, sheet="Suggested threshold")
+write.xlsx(r_hba1 %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-3.xlsx"), 
+           sheetName = str_c("On HBA1"),
+           row.names = F, append = T)
+
+r_hba2 = read_xlsx(params$f3.5, sheet="Suggested threshold")
+write.xlsx(r_hba2 %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-3.xlsx"), 
+           sheetName = str_c("On HBA2"),
+           row.names = F, append = T)
+
+r_hbb = read_xlsx(params$f3.6, sheet="Suggested threshold")
+write.xlsx(r_hbb %>% as.data.frame(), 
+           file.path(params$output_path,
+                     "Supplementary-File-3.xlsx"), 
+           sheetName = str_c("On HBB"),
+           row.names = F, append = T)
+```
