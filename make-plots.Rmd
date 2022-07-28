@@ -348,7 +348,7 @@ write.xlsx(source_data %>% as.data.frame(),
 p_comb = p1 + p2 + p5 + p3 + p4 + p6 + guide_area() + 
   plot_layout(guides="collect", design ="AAA\nAAA\nAAA\nAAA\nAAA\nBCC\nBCC\nDFF\nEFF\nGGG") +
   plot_annotation(tag_levels = "A")
-ggsave(file.path(params$plot_path, "Figure_2.pdf"), 
+ggsave(file.path(params$plot_path, "Figure-2.pdf"), 
        p_comb,  
        width = 210,
        height = 210,
