@@ -1151,7 +1151,7 @@ p = Heatmap(concordance_matr, show_row_dend = F, na_col="#cfcfcf", show_row_name
         left_annotation = row_annotation, 
         height = unit(9, "cm"), width = unit(7, "cm"), 
         heatmap_legend_param = list(by_row=T, color_bar="discrete", at = c(NA, -1,1),
-                                    labels = c( "N/A", "Discordant", "Concordant"),
+                                    labels = c( "N/A", "Incorrect prediction", "Correct prediction"),
                                     title_gp = grid::gpar(fontface = "plain", fontsize = 9) 
                                     ),
         ) 
@@ -1223,7 +1223,7 @@ p = Heatmap(concordance_matr_tricho, show_row_dend = F, na_col="#cfcfcf", show_r
         left_annotation = row_annotation, 
         height = unit(9, "cm"), width = unit(7, "cm"), 
         heatmap_legend_param = list(by_row=T, color_bar="discrete", at = c(NA, -1,1),
-                                    labels = c( "N/A", "Discordant", "Concordant"),
+                                    labels = c( "N/A", "Incorrect prediction", "Correct prediction"),
                                     title_gp = grid::gpar(fontface = "plain", fontsize = 9) 
                                     ),
         ) 
