@@ -50,6 +50,8 @@ write.xlsx(input_full_ds %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-2.xlsx"), 
            sheetName = str_c("Input-Full dataset"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = F)
 
 r_full_ds = read_xlsx(params$f2.1, sheet="Varied prediction threshold")
@@ -57,6 +59,8 @@ write.xlsx(r_full_ds %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-2.xlsx"), 
            sheetName = str_c("On Full dataset"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 input_splicing = read_xlsx(params$f2.2, sheet="Input-Splicing subset")
@@ -64,6 +68,8 @@ write.xlsx(input_splicing %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-2.xlsx"), 
            sheetName = str_c("Input-Splicing"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 r_splicing = read_xlsx(params$f2.2, sheet="Varied prediction thresholds")
@@ -71,6 +77,8 @@ write.xlsx(r_splicing %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-2.xlsx"), 
            sheetName = str_c("On Splicing"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 r_splicing_maxentscan = read_xlsx(params$f2.2, sheet="MaxentScan-Varied prediction th")
@@ -78,6 +86,8 @@ write.xlsx(r_splicing_maxentscan %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-2.xlsx"), 
            sheetName = str_c("On Splicing (MaxentSscan)"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 input_missense = read_xlsx(params$f2.3, sheet="Input-Missense")
@@ -85,6 +95,8 @@ write.xlsx(input_missense %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-2.xlsx"), 
            sheetName = str_c("Input-Missense"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 r_missense = read_xlsx(params$f2.3, sheet="Missense")
@@ -92,6 +104,8 @@ write.xlsx(r_missense %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-2.xlsx"), 
            sheetName = str_c("On Missense"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 input_non_missense = read_xlsx(params$f2.3, sheet="Input-Non Missense")
@@ -99,6 +113,8 @@ write.xlsx(input_non_missense %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-2.xlsx"), 
            sheetName = str_c("Input-Non Missense"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 r_non_missense = read_xlsx(params$f2.3, sheet="Non Missense")
@@ -106,6 +122,8 @@ write.xlsx(r_non_missense %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-2.xlsx"), 
            sheetName = str_c("On Non Missense"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 input_hba1 = read_xlsx(params$f2.3, sheet="Input-HBA1")
@@ -113,6 +131,8 @@ write.xlsx(input_hba1 %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-2.xlsx"), 
            sheetName = str_c("Input-HBA1"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 r_hba1 = read_xlsx(params$f2.3, sheet="HBA1")
@@ -120,6 +140,8 @@ write.xlsx(r_hba1 %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-2.xlsx"), 
            sheetName = str_c("On HBA1"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 input_hba2 = read_xlsx(params$f2.3, sheet="Input-HBA2")
@@ -127,6 +149,8 @@ write.xlsx(input_hba2 %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-2.xlsx"), 
            sheetName = str_c("Input-HBA2"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 r_hba2 = read_xlsx(params$f2.3, sheet="HBA2")
@@ -134,6 +158,8 @@ write.xlsx(r_hba2 %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-2.xlsx"), 
            sheetName = str_c("On HBA2"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 input_hbb = read_xlsx(params$f2.3, sheet="Input-HBB")
@@ -141,6 +167,8 @@ write.xlsx(input_hbb %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-2.xlsx"), 
            sheetName = str_c("Input-HBB"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 r_hbb = read_xlsx(params$f2.3, sheet="HBB")
@@ -148,6 +176,8 @@ write.xlsx(r_hbb %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-2.xlsx"), 
            sheetName = str_c("On HBB"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 ```
 
@@ -161,6 +191,8 @@ write.xlsx(r_full_ds %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-3.xlsx"), 
            sheetName = str_c("On Full dataset & splicing"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = F)
 
 r_missense = read_xlsx(params$f3.2, sheet="Suggested threshold")
@@ -168,6 +200,8 @@ write.xlsx(r_missense %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-3.xlsx"), 
            sheetName = str_c("On Missense"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 r_non_missense = read_xlsx(params$f3.3, sheet="Suggested threshold")
@@ -175,6 +209,8 @@ write.xlsx(r_non_missense %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-3.xlsx"), 
            sheetName = str_c("On Non Missense"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 r_hba1 = read_xlsx(params$f3.4, sheet="Suggested threshold")
@@ -182,6 +218,8 @@ write.xlsx(r_hba1 %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-3.xlsx"), 
            sheetName = str_c("On HBA1"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 r_hba2 = read_xlsx(params$f3.5, sheet="Suggested threshold")
@@ -189,6 +227,8 @@ write.xlsx(r_hba2 %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-3.xlsx"), 
            sheetName = str_c("On HBA2"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 
 r_hbb = read_xlsx(params$f3.6, sheet="Suggested threshold")
@@ -196,5 +236,7 @@ write.xlsx(r_hbb %>% as.data.frame(),
            file.path(params$output_path,
                      "Supplementary-File-3.xlsx"), 
            sheetName = str_c("On HBB"),
+           # do not write "#N/A" to cells but leave empty
+           showNA = FALSE, 
            row.names = F, append = T)
 ```
