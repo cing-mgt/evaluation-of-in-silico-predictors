@@ -140,9 +140,9 @@ ds = read_csv(params$f1) %>%
   mutate(across(c('Chr', 'StartPos', 'EndPos'), ~as.double(.))) %>%
   d_select(ithaID, HGVS, Chr, StartPos, EndPos, pathogenicity, effect)
 ```
-# Descriptive analysis of SNVs - Figure 2 
+# Descriptive analysis of SNVs - Figure 3 
 
-```{r figure-2, echo=FALSE, warning=FALSE, message=FALSE, eval=T}
+```{r figure-3, echo=FALSE, warning=FALSE, message=FALSE, eval=T}
 ithaid_f_gene = read_csv(file.path(params$annotations_path, "ithaid_f_gene.csv"))
 
 plot_data_base = ds %>% 
@@ -180,12 +180,12 @@ p1 = ggplot(plot_data, aes(x= Effect, fill = Gene)) +
 dir.create(file.path(params$plot_path, "plot-source-files"))
 write.xlsx(plot_data_base %>% as.data.frame(), 
            file.path(params$plot_path, "plot-source-files",
-                     "Figure-2-data.xlsx"), 
+                     "Figure-3-data.xlsx"), 
            sheetName = str_c("Panel A - Source data"),
            row.names = F, append = F)
 write.xlsx(plot_data %>% as.data.frame(), 
            file.path(params$plot_path, "plot-source-files",
-                     "Figure-2-data.xlsx"), 
+                     "Figure-3-data.xlsx"), 
            sheetName = str_c("Panel A - Summary data"),
            row.names = F, append = T)
 ####
@@ -213,12 +213,12 @@ p2 = ggplot(plot_data, aes(x = Type, fill = Gene)) +
 source_data = plot_data_base %>% left_join(ithaid_f_hemo, by="ithaID")
 write.xlsx(source_data %>% as.data.frame(), 
            file.path(params$plot_path, "plot-source-files",
-                     "Figure-2-data.xlsx"), 
+                     "Figure-3-data.xlsx"), 
            sheetName = str_c("Panel B - Source data"),
            row.names = F, append = T)
 write.xlsx(plot_data %>% as.data.frame(), 
            file.path(params$plot_path, "plot-source-files",
-                     "Figure-2-data.xlsx"), 
+                     "Figure-3-data.xlsx"), 
            sheetName = str_c("Panel B - Summary data"),
            row.names = F, append = T)
 
@@ -251,7 +251,7 @@ source_data = plot_data_base %>%
   d_filter(subtype =="oxygen")
 write.xlsx(source_data %>% as.data.frame(), 
            file.path(params$plot_path, "plot-source-files",
-                     "Figure-2-data.xlsx"), 
+                     "Figure-3-data.xlsx"), 
            sheetName = str_c("Panel D - Source data"),
            row.names = F, append = T)
 
@@ -270,7 +270,7 @@ source_data = plot_data_base %>%
    d_filter(subtype == "stability")
 write.xlsx(source_data %>% as.data.frame(), 
            file.path(params$plot_path, "plot-source-files",
-                     "Figure-2-data.xlsx"), 
+                     "Figure-3-data.xlsx"), 
            sheetName = str_c("Panel E - Source data"),
            row.names = F, append = T)
 
@@ -307,7 +307,7 @@ source_data = plot_data_base %>%
    d_filter(type %in% c('Thalassaemia')) 
 write.xlsx(source_data %>% as.data.frame(), 
            file.path(params$plot_path, "plot-source-files",
-                     "Figure-2-data.xlsx"), 
+                     "Figure-3-data.xlsx"), 
            sheetName = str_c("Panel C - Source data"),
            row.names = F, append = T)
 
@@ -340,7 +340,7 @@ source_data = plot_data_base %>%
   d_filter(!is.na(name))
 write.xlsx(source_data %>% as.data.frame(), 
            file.path(params$plot_path, "plot-source-files",
-                     "Figure-2-data.xlsx"), 
+                     "Figure-3-data.xlsx"), 
            sheetName = str_c("Panel F - Source data"),
            row.names = F, append = T)
 ###
@@ -348,7 +348,7 @@ write.xlsx(source_data %>% as.data.frame(),
 p_comb = p1 + p2 + p5 + p3 + p4 + p6 + guide_area() + 
   plot_layout(guides="collect", design ="AAA\nAAA\nAAA\nAAA\nAAA\nBCC\nBCC\nDFF\nEFF\nGGG") +
   plot_annotation(tag_levels = "A")
-ggsave(file.path(params$plot_path, "Figure-2.pdf"), 
+ggsave(file.path(params$plot_path, "Figure-3.pdf"), 
        p_comb,  
        width = 210,
        height = 210,
@@ -582,6 +582,20 @@ ds_all = map(c(params$f2.1), read_xlsx, sheet="Varied prediction threshold") %>%
   d_filter(!Tool %in% (ds_splicing %>% distinct(Tool) %>% .[['Tool']])) %>%
   bind_rows(ds_splicing)
 
+x = read_xlsx(params$f2.1, sheet="Varied prediction threshold") %>%
+    d_filter(Tool %in% c('BayesDel_addAF_score','CADD_PHRED', 
+                         'Eigen-PC-phred_coding', 'GERP++_RS', 
+                         'REVEL_score', 'SpliceAI_DS', 
+                         'MetaSVM_score', "phyloP100way_vertebrate", 
+                         "phastCons30way_mammalian")) %>%
+  bind_rows(read_xlsx(params$f2.2, sheet="Varied prediction thresholds") %>%
+    d_filter(Tool == "SpliceAI_DS"))
+write.xlsx(x %>% as.data.frame(), 
+           file.path(params$plot_path, "plot-source-files",
+                     "Figure-5-data.xlsx"), 
+           sheetName = str_c("Panel A - Source data"),
+           row.names = F, append = F)
+
 # this is the plot that is gonna be used in the panel  
 lr_plot = wrap_plotting(ds_all, 'all', c(params$f3.1, params$f3.2))
 
@@ -687,7 +701,7 @@ p = ggplot(plot_data, aes(Threshold_1, Value, colour = test, fill = test)) +
 ggsave(file.path(params$plot_path, "all-subset",  "likelihood-maxentscan.pdf"), p,  device = "pdf", width = 13, units = "in")
 ```
 
-# Figure 3B and 3C
+# Figure 5B and 5C
 
 ```{r concordance-4-upset, echo=FALSE, warning=FALSE, message=FALSE}
 
@@ -710,9 +724,9 @@ concordance_p = concordance_rate %>%
 
 write.xlsx(concordance_p %>% d_select(-tools) %>% as.data.frame(), 
            file.path(params$plot_path, "plot-source-files",
-                     "Figure-3-data.xlsx"), 
+                     "Figure-5-data.xlsx"), 
            sheetName = str_c("Panel B - Source data"),
-           row.names = F, append = F)
+           row.names = F, append = T)
 
 concordance_b = concordance_rate %>%
   mutate_if(is.numeric, ~round(., 1)) %>%
@@ -731,9 +745,9 @@ concordance_b = concordance_rate %>%
 
 write.xlsx(concordance_b %>% d_select(-tools) %>% as.data.frame(), 
            file.path(params$plot_path, "plot-source-files",
-                     "Figure-3-data.xlsx"), 
+                     "Figure-5-data.xlsx"), 
            sheetName = str_c("Panel C - Source data"),
-           row.names = F, append = F)
+           row.names = F, append = T)
    
 p = concordance_p %>%
   ggplot(aes(x=tools)) +
@@ -848,13 +862,13 @@ b = concordance_b %>%
  #                   }) 
 ```
 
-# Figure-3
+# Figure-5
 
 ```{r performance-figure, echo=FALSE, warning=FALSE, message=FALSE}
 p_comb = lr_plot + p + b +
   plot_layout(design ="AAA\nAAA\nAAA\nB#C\n") +
   plot_annotation(tag_levels = "A")
-ggsave(file.path(params$plot_path, "Figure-3.pdf"), 
+ggsave(file.path(params$plot_path, "Figure-5.pdf"), 
        p_comb,  
        width = 210,
        height = 210,
@@ -864,7 +878,7 @@ ggsave(file.path(params$plot_path, "Figure-3.pdf"),
 
 ```
 
-# Supplementary Figure-1
+# Figure-1 supplement
 
 ```{r compare-initial-annotation}
 # source data is the input file to the whole analysis
@@ -885,7 +899,7 @@ p = ggplot(plot_data, aes(x = initial, y = cnt, fill = final)) +
   scale_fill_manual(values = setNames(c("#4ca6ff", "#ff4cff", "#35b235"), c("VUS", "P/LP", "B/LB"))) +
   theme(legend.position="bottom")
 
-ggsave(file.path(params$plot_path, "Supplementary-Figure-1.pdf"), 
+ggsave(file.path(params$plot_path, "Figure-1-S1.pdf"), 
        p,  
        width = 210,
        height = 210,
@@ -894,7 +908,7 @@ ggsave(file.path(params$plot_path, "Supplementary-Figure-1.pdf"),
        dpi="retina")
 ```
 
-# Supplementary Figure-2
+# Figure-2
 
 ```{r construct-tracks, echo=FALSE, warning=FALSE, message=FALSE, include=FALSE, eval = T}
 box::use(Gviz[...], 
@@ -1053,7 +1067,7 @@ map2ensembl_id = tibble(
   tx_ids = c("79899", "79901", "61400")) 
 symbol(grtrack) = map2ensembl_id[match(symbol(grtrack), map2ensembl_id$ensembl), 'hgnc'][[1]]
 
-pdf(file.path(params$plot_path, "Supplementary-Figure-2.pdf"))
+pdf(file.path(params$plot_path, "Figure-2.pdf"))
 grid.newpage()
 pushViewport(viewport(layout = grid.layout(3, 1, heights=c(0.33,0.33,0.33))))
 pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
@@ -1083,7 +1097,7 @@ plotTracks(list(genome_track_11, grtrack, dtrack11_freq_vus, dtrack11_freq_p, dt
 dev.off()
 ```
 
-# Supplementary Figure-3
+# Figure-4
 
 ```{r heatmap, echo=FALSE, warning=FALSE, message=FALSE}
 box::use(ComplexHeatmap[...])
@@ -1118,7 +1132,7 @@ concordance_df_expanded = concordance_df %>%
 
 write.xlsx(concordance_df_expanded %>% as.data.frame(), 
            file.path(params$plot_path, "plot-source-files",
-                     "Supplementary-Figure-3-data.xlsx"), 
+                     "Figure-4-data.xlsx"), 
            sheetName = str_c("Source data"),
            row.names = F, append = F)
 
@@ -1157,12 +1171,12 @@ p = Heatmap(concordance_matr, show_row_dend = F, na_col="#cfcfcf", show_row_name
         ) 
 
 
-pdf(file.path(params$plot_path, "Supplementary-Figure-3.pdf")) 
+pdf(file.path(params$plot_path, "Figure-4.pdf")) 
 draw(p)
 dev.off()
 ```
 
-# Supplementary Figure-4
+# Figure-5 supplement - panel A
 
 ```{r heatmap-separate-th, echo=FALSE, warning=FALSE, message=FALSE}
 box::use(ComplexHeatmap[...])
@@ -1190,8 +1204,8 @@ concordance_df_tricho = concordance_trichotomised %>%
 
 write.xlsx(concordance_df_tricho %>% as.data.frame(), 
            file.path(params$plot_path, "plot-source-files",
-                     "Supplementary-Figure-4-data.xlsx"), 
-           sheetName = str_c("Source data"),
+                     "Figure-5-S1-data.xlsx"), 
+           sheetName = str_c("Panel A - Source data"),
            row.names = F, append = F)
 
 concordance_matr_tricho = concordance_df_tricho %>%
@@ -1227,14 +1241,27 @@ p = Heatmap(concordance_matr_tricho, show_row_dend = F, na_col="#cfcfcf", show_r
                                     title_gp = grid::gpar(fontface = "plain", fontsize = 9) 
                                     ),
         ) 
+heatmap_grob = grid.grabExpr(draw(
+  Heatmap(concordance_matr_tricho, show_row_dend = F, na_col="#cfcfcf", show_row_names = F, 
+        name=" ", column_names_rot = 45, col = divergent_colors, 
+        cluster_rows = T, clustering_distance_rows = "euclidean", clustering_method_rows = "complete",
+        column_names_gp = grid::gpar(fontsize = 6),
+        left_annotation = row_annotation, 
+        height = unit(9, "cm"), width = unit(7, "cm"), 
+        heatmap_legend_param = list(by_row=T, color_bar="discrete", at = c(NA, -1,1),
+                                    labels = c( "N/A", "Incorrect prediction", "Correct prediction"),
+                                    title_gp = grid::gpar(fontface = "plain", fontsize = 9) 
+                                    ),
+        ) 
+)) 
 
-pdf(file.path(params$plot_path, "Supplementary-Figure-4.pdf")) 
+pdf(file.path(params$plot_path, "Figure-5-S1-panel-A.pdf")) 
 draw(p)
 dev.off()
 ```
 
 
-# Supplementary Figure-5
+# Figure-5 supplement - panel B
 
 ```{r vus-analysis, echo=FALSE, warning=FALSE, message=FALSE}
 vus_stats = read_csv(params$f7) %>%
@@ -1244,8 +1271,16 @@ vus_stats = read_csv(params$f7) %>%
                                         c("p_cnt", "b_cnt", "vus_cnt","na_cnt"))), 
                           levels = rev(c("P/LP", "B/LB","VUS", "NA"))), 
          Tool = recode(Tool, !!!setNames(tool_names_formatted$formatted_name, tool_names_formatted$Tool)), 
-         Tool = factor(Tool, levels = rev(sort(tool_names_formatted$formatted_name))),
-         total = sum(value), 
+         Tool = factor(Tool, levels = rev(sort(tool_names_formatted$formatted_name))))
+
+write.xlsx(vus_stats %>% as.data.frame(), 
+           file.path(params$plot_path, "plot-source-files",
+                     "Figure-5-S1-data.xlsx"), 
+           sheetName = str_c("Panel B - Source data"),
+           row.names = F, append = F)
+
+vus_stats = vus_stats %>%
+  mutate(total = sum(value), 
          Percent = value/total * 100, 
          value = ifelse(value == 0, NA, value)) 
 
@@ -1256,10 +1291,22 @@ v = ggplot(vus_stats %>% d_filter(Tool != "SpliceAI"), aes(x = Tool, fill = Call
             size=3, color = "white") +
   scale_fill_manual(values = setNames(c("#ff4cff", "#35b235", "#4ca6ff", "grey"),
                                       c("P/LP", "B/LB", "VUS", "NA"))) +
+  # this is so that 0 is at the intersection of x axis with y
+  scale_y_continuous(expand = expansion(mult = c(0.025, 0))) +
   coord_flip() + ylab("Percent") + xlab("") +
+  theme(aspect.ratio = 1) +
   theme_cowplot(font_size = 10) 
 
-ggsave(v, filename = file.path(params$plot_path, "Supplementary-Figure-5.pdf"))
+ggsave(v, filename = file.path(params$plot_path, "Figure-5-S1-panel-B.pdf"))
+
+pdf(file.path(params$plot_path, "Figure-5-S1.pdf"))
+plot_grid(NULL, heatmap_grob, NULL, v, nrow = 4,
+          align = 'hv', axis = "tblr",
+          rel_heights = c(0.2, 1.5, 0.2, 1), 
+          rel_widths = c(0.2, 1, 0.2, 0.75), 
+          labels = c("", "A", "", "B"), scale=1, label_size = 10)
+dev.off()
+
 ```
 
 
