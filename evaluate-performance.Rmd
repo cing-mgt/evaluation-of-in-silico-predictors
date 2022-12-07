@@ -225,6 +225,11 @@ thresholds = vep_results %>%
                                                                              .[['thresholds']] %>% 
                                                                              unlist, 
                                                                           1.935)),
+                     tool == "MetaSVM_score" ~ list(c(th_ranges %>% 
+                                                        d_filter(tool == "MetaSVM_score") %>%
+                                                        .[['thresholds']] %>%
+                                                        unlist, 
+                                                        0.45, 0.6, 0.85)),
                      tool == "PROVEAN_score_seperated" ~list(c(th_ranges %>% 
                                                                   d_filter(tool == "PROVEAN_score_seperated") %>%
                                                                   .[['thresholds']] %>% 
@@ -259,7 +264,7 @@ thresholds = vep_results %>%
                      tool == "Condel_score" ~list(c(seq(0.05, 0.95, 0.05), 0.49)),
                      tool %in%  c("SIFT_score","integrated_fitCons_score","MutationTaster_score",
                                   "SpliceAI_DS","ClinPred_score","LIST-S2_score_seperated",
-                                  "MetaSVM_score", "MutPred_score","REVEL_score",
+                                  "MutPred_score","REVEL_score",
                                   "VEST4_score_seperated", "fathmm-MKL_coding_score","ada_score",
                                   "rf_score","","MetaLR_score") ~list(seq(0.05,0.95, by=0.05))), 
            th_class = case_when(

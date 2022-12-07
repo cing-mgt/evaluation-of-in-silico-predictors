@@ -331,10 +331,10 @@ get_refined_thresholds = function(input,
                                             th_class == "below" ~ str_c(">=", th_b)),
              `Strength (Pathogenic)` = case_when(`LR+_CI_lower` >= 350 ~"Very Strong",
                                                  `LR+_CI_lower` >= 18.7 ~"Strong",
-                                                 `LR+_CI_lower` >= 4.3 ~"Moderate",
+                                                 `LR+_CI_lower` >= 4.33 ~"Moderate",
                                                  `LR+_CI_lower` >= 2.08 ~"Supporting"),
              `Strength (Benign)` = case_when(`LR-_CI_upper` <= 1/2.08 ~"Supporting",
-                                             `LR-_CI_upper` <= 1/4.3 ~"Moderate",
+                                             `LR-_CI_upper` <= 1/4.33 ~"Moderate",
                                              `LR-_CI_upper` <= 1/18.7 ~"Strong",
                                              `LR-_CI_upper` <= 1/350 ~"Very Strong"),
              diff = th_p - th_b
@@ -506,6 +506,8 @@ get_concordance = function(r){
 pathogenic_binary = pathogenic_snvs %>% 
    d_select(c('ithaID', 'HGVS', ultimate_thresholds_formatted %>% .[['tool']])) %>% 
    pivot_longer(-c(ithaID, HGVS), names_to = "tool", values_to = "value") %>% 
+   # removing splicing tools
+   d_filter(tool != "SpliceAI_DS") %>%
    left_join(ultimate_thresholds_formatted %>% d_select(-th_b), by="tool") %>% 
    mutate(concordance = case_when(th_class == "below" & value < th_p ~ 1,
                                   th_class == "below_closed" & value <= th_p ~ 1, 
@@ -523,6 +525,8 @@ concordance_pathogenic = get_concordance(pathogenic_binary) %>%
 benign_binary = benign_snvs %>% 
    d_select(c('ithaID', 'HGVS', ultimate_thresholds_formatted %>% .[['tool']])) %>% 
    pivot_longer(-c(ithaID, HGVS), names_to = "tool", values_to = "value") %>% 
+   # removing splicing tools
+   d_filter(tool != "SpliceAI_DS") %>%
    left_join(ultimate_thresholds_formatted %>% d_select(-th_p), by="tool") %>% 
    mutate(concordance = case_when(th_class == "below" & value >= th_b ~ 1,
                                   th_class == "below_closed" & value > th_b ~ 1, 

@@ -377,7 +377,7 @@ wrap_plotting = function(ds, subset_label, f_vlines, plot_all = T){
   
   # based on the Bayesian framework 
   evidence_strength = tibble(strength =  c("Very Strong", "Strong", "Moderate", "Supporting"),
-                             value = c(350, 18.7, 4.3, 2.08))
+                             value = c(350, 18.7, 4.33, 2.08))
   
   ds_hlines = tibble(Tool = (ds %>% .[['Tool']] %>% as.factor() %>% levels()), 
                      upper_bound = ds %>% group_by(Tool) %>% summarise(tmp = max(`LR+`)) %>% .[['tmp']], 
@@ -385,12 +385,12 @@ wrap_plotting = function(ds, subset_label, f_vlines, plot_all = T){
                      xmin = ds %>% group_by(Tool) %>% summarise(tmp = min(Threshold)) %>% .[['tmp']], 
                      ) %>%
     mutate( supporting_plus = case_when(upper_bound >= 2.08 | upper_bound >= (2.08 - 5)  ~ 2.08), 
-            moderate_plus = case_when(upper_bound >= 4.3 | upper_bound >= (4.3 - 5)  ~ 4.3), 
+            moderate_plus = case_when(upper_bound >= 4.33 | upper_bound >= (4.33 - 5)  ~ 4.33), 
             strong_plus = case_when(upper_bound >= 18.7 | upper_bound >= (18.7 - 5)  ~ 18.7), 
             vstrong_plus = case_when(upper_bound >= 350 | upper_bound >= (350 - 5)  ~ 350), 
             supporting_minus = case_when(lower_bound <= (1/2.08) | lower_bound <= ((1/2.08) + 0.1)  ~ 1/2.08), 
             # removing moderate benign as that doesn't exist
-            #moderate_minus = case_when(lower_bound <= (1/4.3) | lower_bound <= ((1/4.3) + 0.1)  ~ 1/4.3), 
+            #moderate_minus = case_when(lower_bound <= (1/4.33) | lower_bound <= ((1/4.33) + 0.1)  ~ 1/4.33), 
             strong_minus = case_when(lower_bound <= (1/18.7) | lower_bound <= ((1/18.7) + 0.05)  ~ 1/18.7), 
             vstrong_minus = case_when(lower_bound <= (1/350) | lower_bound <= ((1/350) + 0.005)  ~ 1/350), 
            )
@@ -632,7 +632,7 @@ maxentscan_vlines = read_csv(params$f3.3) %>%
 
 # in the paper the very strong threshold is 350, I assume it's a typo but confirm
 evidence_strength = tibble(strength =  c("Very Strong", "Strong", "Moderate", "Supporting"),
-                           value = c(350, 18.7, 4.3, 2.08))
+                           value = c(350, 18.7, 4.33, 2.08))
 
 ds_maxentscan_hlines = tibble(Tool_1 = (ds_maxentscan %>% .[['Tool_1']] %>% as.factor() %>% levels()), 
                    upper_bound = ds_maxentscan  %>% summarise(tmp = max(`LR+`)) %>% .[['tmp']], 
@@ -640,12 +640,12 @@ ds_maxentscan_hlines = tibble(Tool_1 = (ds_maxentscan %>% .[['Tool_1']] %>% as.f
                    xmin = ds_maxentscan %>%  summarise(tmp = min(Threshold_1)) %>% .[['tmp']], 
                    ) %>%
   mutate( supporting_plus = case_when(upper_bound >= 2.08 | upper_bound >= (2.08 - 5)  ~ 2.08), 
-          moderate_plus = case_when(upper_bound >= 4.3 | upper_bound >= (4.3 - 5)  ~ 4.3), 
+          moderate_plus = case_when(upper_bound >= 4.33 | upper_bound >= (4.33 - 5)  ~ 4.33), 
           strong_plus = case_when(upper_bound >= 18.7 | upper_bound >= (18.7 - 5)  ~ 18.7), 
           vstrong_plus = case_when(upper_bound >= 350 | upper_bound >= (350 - 5)  ~ 350), 
           supporting_minus = case_when(lower_bound <= (1/2.08) | lower_bound <= ((1/2.08) + 0.1)  ~ 1/2.08), 
           # removing moderate benign as that doesn't exist
-          #moderate_minus = case_when(lower_bound <= (1/4.3) | lower_bound <= ((1/4.3) + 0.1)  ~ 1/4.3), 
+          #moderate_minus = case_when(lower_bound <= (1/4.33) | lower_bound <= ((1/4.33) + 0.1)  ~ 1/4.33), 
           strong_minus = case_when(lower_bound <= (1/18.7) | lower_bound <= ((1/18.7) + 0.05)  ~ 1/18.7), 
           vstrong_minus = case_when(lower_bound <= (1/350) | lower_bound <= ((1/350) + 0.005)  ~ 1/350), 
          )
